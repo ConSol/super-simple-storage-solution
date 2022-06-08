@@ -3,6 +3,22 @@
 :toc:
 = Super Simple Storage Solution (S4)
 
+== Quick Facts
+
+[cols="1,1,1,1"]
+|===
+| Service Name | URL | Username | Password
+| `rest-api` (Swagger-documentation) | http://localhost:8080/q/swagger-ui | N/A | N/A
+| `aggregator` | http://localhost:8081 | N/A | N/A
+| postgres | localhost:5432 | postgres | postgres
+| pgadmin4 (UI for postgres database) | http://localhost:8091 | \pgadmin4@pgadmin.org | pgadmin4
+| Artemis (Web-console) | http://localhost:8161/console | artemis | artemis
+| Artemis (AMQP-Port) | localhost:5671 | N/A | N/A
+| Grafana (Monitoring) | http://localhost:3000 | grafana | grafana
+| Jaeger (Tracing) | http://localhost:16686 | N/A | N/A
+| Kibana (Log-Aggregation) | http://localhost:5601 | N/A | N/A
+|===
+
 == Introduction
 
 This is a sample project that allows uploading files through multiple HTTP requests.
