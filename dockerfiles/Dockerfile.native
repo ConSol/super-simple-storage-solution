@@ -1,0 +1,10 @@
+# 1.0
+FROM quay.io/quarkus/quarkus-micro-image@sha256:bc172982173253eebcc9483c3fc092d6272e79b97273a201a197738cd1bcaf75
+
+COPY --chown=185 target/emptydir /deployment
+COPY --chown=185 target/*-runner /deployment/quarkus-run
+
+USER 185
+WORKDIR /deployment
+
+ENTRYPOINT ["./quarkus-run", "-Dquarkus.http.host=0.0.0.0"]

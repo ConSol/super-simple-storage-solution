@@ -1,0 +1,80 @@
+quarkus:
+  datasource:
+    db-kind: postgresql
+    username: ${DB_USERNAME:upload}
+    password: ${DB_PASSWORD:upload}
+    jdbc:
+      driver: io.opentracing.contrib.jdbc.TracingDriver
+      url: jdbc:tracing:${quarkus.datasource.db-kind}://${DB_HOST:localhost:5432}/${DB_NAME:upload}
+      min-size: ${DB_MIN_SIZE:2}
+      max-size: ${DB_MAX_SIZE:8}
+  devservices:
+    enabled: false
+  jaeger:
+    endpoint: ${TRACING_ENDPOINT:http://localhost:14268/api/traces}
+    service-name: rest-api
+    sampler-type: const
+    sampler-param: 1
+  log:
+    console:
+      format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X{CorrelationID}] (%t) %s%e%n'
+    handler:
+      gelf:
+        enabled: ${GELF_ENABLED:true}
+        include-full-mdc: true
+        host: ${GELF_HOST:localhost}
+        port: ${GELF_PORT:12201}
+        additional-field:
+          app:
+            type: String
+            value: rest-api
+          pod:
+            type: String
+            value: ${POD_NAME:rest-api-0}
+  smallrye-openapi:
+    enable: true
+    info-title: Super Simple Storage Solution REST API
+    info-version: 1.0
+    info-description:
+      This is the S4 REST API. Its core feature is that an upload can be distributed over multiple 
+      requests, making it both resilient and performant.
+      
+      
+      An upload always starts with a post on endpoint `/uploads`. With this, we receive an 
+      unique `uploadId`. From here on out, we can upload the parts of our and tell the backend how 
+      many parts there will be.
+      
+      
+      Each file upload consist of some binary data (transmitted as octet stream) and a 
+      `partNumber`. When we want to send our uploads in `N` parts, they must be numbered
+      consecutively from `1` to `N`, although we can transfer them in any order and even in 
+      parallel. Setting the `totalParts` of an upload can also be done at any point in time after
+      the upload has been initialized.
+      
+      
+      Processing of the parts can only be done once all parts are present, in particular we must
+      not forget to set the `totalParts` of an upload since the backend is unable to determine
+      whether all parts have arrive without this information.
+      
+      
+      The backend will take care of merging all parts together once they have arrived.
+  swagger-ui:
+    always-include: true
+mp:
+  messaging:
+    outgoing:
+      amqp-upload-ready-for-processing-outgoing:
+        address: upload-ready-for-processing
+        connector: smallrye-amqp
+        durable: true
+        host: ${AMQP_HOST:localhost}
+        port: ${AMQP_PORT:5672}
+        username: ${AMQP_USERNAME:artemis}
+        password: ${AMQP_PASSWORD:artemis}
+        use-anonymous-sender: false
+"%dev":
+   quarkus:
+     flyway:
+       migrate-at-start: true
+       baseline-on-migrate: true
+       validate-on-migrate: true

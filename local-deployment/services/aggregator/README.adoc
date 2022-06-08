@@ -1,0 +1,215 @@
+:listing-caption: Listing
+:experimental:
+:toc:
+= Super Simple Storage Solution (S4)
+
+== Introduction
+
+This is a sample project that allows uploading files through multiple HTTP requests.
+
+Its aim is not to implement a complex service, but to show how we can work with quarkus and how we can implement certain concepts.
+
+As such, the discussion of the business use case will be short, and we will take a deeper look at the features used.
+
+== Architecture
+
+S4 currently consists of two microservices:
+
+* one microservice providing the REST API (we will call this microservice `_rest-api_`), and
+* one microservice triggered through a messaging system (https://activemq.apache.org/components/artemis/:[ActiveMQ Artemis] through https://www.amqp.org/:[AMQP]) to aggregate upload parts into a final, downloadable file (we will call this microservice `_aggregator_`).
+
+=== REST API Usage
+
+The idea is that users can upload one file through multiple parts. Each part can then be transmitted in a separate HTTP request. If an upload is transmitted in `N` parts, the whole upload will take `N + 2` requests:
+
+* One request to start the upload. The response of this request contains an `id`, which is used to reference the upload in subsequent requests. We will call this request `_startUpload_`.
+* `N` part-uploads. The `partNumbers` have to be numbered from `1` to `N`. We will call those requests `_addPart_`.
+* One request to tell S4 how many parts the whole upload has. We will call this request `_setTotalParts_`.
+
+The `startUpload` request has to be called first. All other requests (`addPart(...)` as well as `setTotalParts`) can happen in any order.
+
+The parts are stored in a https://www.postgresql.org/:[PostgreSQL] database. When all parts have been transmitted, the `rest-api` sends a message over the messaging system to the `aggregator`, which then fetches all parts form the database, aggregates them to one file, and writes them back to the database.
+
+=== Sequence diagram
+
+Following is a sequence diagram, showing the core functionality of S4. This is mostly the happy path. Furthermore, some side functionalities (like deletion of uploads, and download of parts) are not shown.
+
+.Sequence diagram for the core functionality of S4
+[plantuml, target=diagram-sequence, format=png]
+----
+@startuml
+skinparam sequenceArrowThickness 2
+skinparam sequenceArrowColor Black
+actor Alice
+
+== Start Upload ==
+Alice -> "rest-api": ""POST /uploads"" to start upload
+database PostgreSQL
+"rest-api" -> PostgreSQL: writes data
+"rest-api" <- PostgreSQL
+Alice <- "rest-api": responds with ""id"" of the upload
+
+
+== Content Upload ==
+Alice -[#Blue]> "rest-api": ""POST /uploads/{id}/parts"" to upload part
+activate "rest-api" #Blue
+"rest-api" -[#Blue]> PostgreSQL: writes data
+activate PostgreSQL #Blue
+
+Alice -[#Red]> "rest-api": ""POST /uploads/{id}/totalParts"" to set the ""totalParts"" of the upload
+activate "rest-api" #Red
+"rest-api" -[#Red]> PostgreSQL: writes data
+activate PostgreSQL #Red
+
+Alice -[#Green]> "rest-api": ""POST /uploads/{id}/parts"" to upload part
+activate "rest-api" #Green
+"rest-api" -[#Green]> PostgreSQL: writes data
+activate PostgreSQL #Green
+...
+"rest-api" <[#Red]- PostgreSQL
+deactivate PostgreSQL #Red
+Alice <-[#Red]- "rest-api": response to `totalParts`
+deactivate "rest-api" #Red
+...
+"rest-api" <[#Blue]- PostgreSQL
+deactivate PostgreSQL #Blue
+Alice <-[#Blue]- "rest-api": response to `uploadPart`
+deactivate "rest-api" #Blue
+
+"rest-api" <[#Green]- PostgreSQL
+deactivate PostgreSQL #Green
+Alice <-[#Green]- "rest-api": response to `uploadPart`
+deactivate "rest-api" #GREEN
+
+== Processing ==
+"rest-api" -> "rest-api": detects that all parts are present
+
+queue ActiveMQ
+"rest-api" --> ActiveMQ: Upload 'id` can be processed
+
+ActiveMQ --> accumulator: Upload `id` can be processed
+
+accumulator -> PostgreSQL: loads parts
+activate PostgreSQL #Black
+accumulator <- PostgreSQL
+deactivate PostgreSQL #Black
+
+accumulator -> accumulator: aggregates parts
+
+accumulator -> PostgreSQL: writes result back
+activate PostgreSQL #Black
+accumulator <- PostgreSQL
+deactivate PostgreSQL #Black
+
+== Download ==
+
+Alice -> "rest-api": ""GET /uploads/{id}/content"" to download the file
+"rest-api" -> PostgreSQL: loads data
+activate PostgreSQL #Black
+"rest-api" <- PostgreSQL
+deactivate PostgreSQL #black
+Alice <- "rest-api": reesponds with file
+@enduml
+----
+
+== Project setup
+
+This chapter discusses the project setup, mainly the folder structure and gives a rational as to why it is the way it is. Keep in mind that this is a sample project. in a real project, we can extract-out parts in, for example, separate repositories.
+
+== Build-System Setup: Maven
+
+As build system, we are using https://maven.apache.org/:[Apache Maven] in a multi-module-setup. Since the folder structure is quite complex, we will focus on the parts relevant to maven in this chapter.
+
+The following listing shows the directories that represent maven modules. each directory contains a `pom.xml` file.
+
+.Folder structure of the S4 project
+----
+super-simple-storage-solution
+├── bom
+├── commons
+│   ├── correlation
+│   ├── correlation-http
+│   ├── http-exceptions
+│   ├── micrometer-jvm-extras
+│   ├── opentracing-amqp
+│   └── opentracing-messaging
+└── services
+    ├── aggregator
+    └── rest-api
+----
+
+=== Naming conventions
+
+Each mddule's `artifactId` is constructed by following rules:
+
+* The root module is called `s4`
+* Each module adds its path from the root module as suffix to the name, with hierarchy levels represented by dashes (`-`)
+* If a module contains submodules, it appends `-parent` to its name.
+
+So for example, the module residing in folder `super-simple-storage-solution/service/aggregator` is named `s4-services-aggregator`. The module residing in `super-simple-storage-solution/commons` is called `s4-commons-parent`.
+
+Aside from the `artifactId`, each moduel has a name. The rules here are:
+
+* the root is called `S4`
+* ach module adds its path from the root module as suffix to the name, with hierarchy levels represented by `::`, surrounded by blanks
+* The names are capitalized where applicable. Dashes in folder names are replaced with blanks. The names can also be extended
+
+So for example, the module residing in `super-simple-storage-solution/services/rest-api` has the name `S4 {two-colons} Services {two-colons} REST API`. The module residing in `super-simple-storage-solution/commons/micrometer-jvm-extras` is called `S4 {two-colons} Commons {two-colons} MicroMeter JVM Extras`.
+
+If not otherwise noted, we will reference the modules by their name, not their `artifactId`.
+
+=== Dependency structure
+
+All modules use the next module in the directory hierarchy as their parent. So `S4 {two-colons} Commons {two-colons} Correlation` 's parent is `S4 {two-colons} Commons`, while `S4 {two-colons} Commons` ' parent is `S4`. The only exception to this rule is the `S4 {two-colons} BOM` module. It is the direct parent of the `S4` module and thus the root of this project's dependency structure. Net following figure visualizes this structure.
+
+.Sequence diagram for the core functionality of S4
+[plantuml, target=diagram-usecase, format=png]
+----
+@startuml
+(S4) -up-|> (S4 :: BOM)
+
+(S4 :: Services) -up-|> (S4)
+(S4 :: Commons) -up-|> (S4)
+
+
+(S4 :: Services :: Aggregator) -up-|> (S4 :: Services)
+(S4 :: Services :: REST API) -up-|> (S4 :: Services)
+
+(S4 :: Commons :: Correlation) -up-|> (S4 :: Commons)
+(S4 :: Commons :: Correlation HTTP) -up-|> (S4 :: Commons)
+(S4 :: Commons :: HTTP exceptions) -up-|> (S4 :: Commons)
+(S4 :: Commons :: Opentracing messaging) -up-|> (S4 :: Commons)
+(S4 :: Commons :: Opentracing AMQP)  -up-|> (S4 :: Commons)
+@enduml
+----
+
+=== Semantics of the parent modules
+
+We will now take a high-level view of the parent modules, i.e. `S4 {two-colons} BOM`, `S4`, `S4 {two-colons} Commons` and `S4 {two-colons} Services`.
+
+==== Module `S4 {two-colons} BOM`
+
+File: file:///bom/pom.xml:[bom/pom.xml]
+
+This is the https://reflectoring.io/maven-bom/:[Bill of Materials] (short _BOM_) of the project. All dependency versions (including the version of all submodules) are defined here. It acts as a central definition for all dependencies and plugins used. As such, it contains
+
+* a `<properties>` section with one property per version for a dependency and/or plugin,
+* a `<pluginManagement>` section with all plugin definitions,
+* a `<plugins>` section, activating plugins needed on all modules,
+* a `<dependencyManangement>` section with all dependency definitions, and
+* a `depdendencies>` section with common dependencies over all projects.
+
+The plugins in the `<pluginManagement>` section are generally ordered in the order they are executed. For example, `maven-compiler-plugin` and `quarkus-maven-plugin` are executed during compile phase, while `maven-checkstyle-plugin` and `maven-surefire-plugin` are executed during test phase.
+
+The `<plugins>` section includes plugins used by all modules. Those are currently three: the `maven-compiler-plugin`, the `maven-checkstyle-plugin` and the `maven-surefire-plugin`. The plugins are ordered in the same manner as the plugins in the `<pluginManagement`-section are.
+
+The dependencies in the `<dependencyManangement>` section are ordered in the following way:
+
+1. Quarkus main dependencies
+2. Quarkiverse depdencies (currently none)
+3. Quarkus-dependencies form `S4 {two-colons} Commons`
+4. Non-quarkus dependencies
+5. Test dependencies
+6. Annotation processors
+
+In the `<dependencies>`-section, two dependencies are activated globally: `mapstruct` and `lombok`. Those dependencies are available in all submodules.
