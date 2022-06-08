@@ -217,13 +217,13 @@ This is the https://reflectoring.io/maven-bom/:[Bill of Materials] (short _BOM_)
 
 The plugins in the `<pluginManagement>` section are generally ordered in the order they are executed. For example, `maven-compiler-plugin` and `quarkus-maven-plugin` are executed during compile phase, while `maven-checkstyle-plugin` and `maven-surefire-plugin` are executed during test phase.
 
-The `<plugins>` section includes plugins used by all modules. Those are currently three: the `maven-compiler-plugin`, the `maven-checkstyle-plugin` and the `maven-surefire-plugin`. The plugins are ordered in the same manner as the plugins in the `<pluginManagement`-section are.
+The `<plugins>` section includes plugins used by all modules. Those are currently three: the `maven-compiler-plugin`, the `maven-checkstyle-plugin` and the `maven-surefire-plugin`. The plugins are ordered in the same manner as the plugins in the `<pluginManagement>`-section are.
 
 The dependencies in the `<dependencyManangement>` section are ordered in the following way:
 
 1. Quarkus main dependencies
 2. Quarkiverse dependencies (currently none)
-3. Quarkus-dependencies form `S4 {two-colons} Commons`
+3. Quarkus-dependencies from `S4 {two-colons} Commons`
 4. Non-quarkus dependencies
 5. Test dependencies
 6. Annotation processors
