@@ -13,6 +13,7 @@ quarkus:
   http:
     port: 8081
   jaeger:
+    enabled: ${TRACING_ENABLED:true}
     endpoint: ${TRACING_ENDPOINT:http://localhost:14268/api/traces}
     service-name: aggregator
     sampler-type: const
