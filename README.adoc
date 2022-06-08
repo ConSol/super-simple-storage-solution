@@ -81,29 +81,29 @@ Alice -[#Green]> "rest-api": ""POST /uploads/{id}/parts"" to upload part
 activate "rest-api" #Green
 "rest-api" -[#Green]> PostgreSQL: writes data
 activate PostgreSQL #Green
-...
-"rest-api" <[#Red]- PostgreSQL
-deactivate PostgreSQL #Red
-Alice <-[#Red]- "rest-api": response to `totalParts`
-deactivate "rest-api" #Red
-...
-"rest-api" <[#Blue]- PostgreSQL
-deactivate PostgreSQL #Blue
-Alice <-[#Blue]- "rest-api": response to `uploadPart`
-deactivate "rest-api" #Blue
 
 "rest-api" <[#Green]- PostgreSQL
 deactivate PostgreSQL #Green
-Alice <-[#Green]- "rest-api": response to `uploadPart`
+Alice <-[#Green]- "rest-api": response to ""uploadPart""
 deactivate "rest-api" #GREEN
+
+"rest-api" <[#Red]- PostgreSQL
+deactivate PostgreSQL #Red
+Alice <-[#Red]- "rest-api": response to ""totalParts""
+deactivate "rest-api" #Red
+
+"rest-api" <[#Blue]- PostgreSQL
+deactivate PostgreSQL #Blue
+Alice <-[#Blue]- "rest-api": response to ""uploadPart""
+deactivate "rest-api" #Blue
 
 == Processing ==
 "rest-api" -> "rest-api": detects that all parts are present
 
 queue ActiveMQ
-"rest-api" --> ActiveMQ: Upload 'id` can be processed
+"rest-api" --> ActiveMQ: Upload ""id"" can be processed
 
-ActiveMQ --> accumulator: Upload `id` can be processed
+ActiveMQ --> accumulator: Upload ""id"" can be processed
 
 accumulator -> PostgreSQL: loads parts
 activate PostgreSQL #Black
@@ -124,7 +124,7 @@ Alice -> "rest-api": ""GET /uploads/{id}/content"" to download the file
 activate PostgreSQL #Black
 "rest-api" <- PostgreSQL
 deactivate PostgreSQL #black
-Alice <- "rest-api": reesponds with file
+Alice <- "rest-api": responds with file
 @enduml
 ----
 
