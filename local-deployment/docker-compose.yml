@@ -214,7 +214,7 @@ services:
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:7.10.2
     volumes:
-      - ${REMOTE_PROJECT_PATH:-.}/logstash/usr/share/logstash/pipelines:/usr/share/logstash/pipeline:ro
+      - ${REMOTE_PROJECT_PATH:-.}/logstash/usr/share/logstash/pipeline:/usr/share/logstash/pipeline:ro
     depends_on:
       - elasticsearch
     ports:
