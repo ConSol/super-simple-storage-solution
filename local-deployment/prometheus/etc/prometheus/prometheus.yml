@@ -12,4 +12,4 @@ scrape_configs:
     metrics_path: '/q/metrics'
 
     static_configs:
-      - targets: ['rest-api:8080', 'aggregator:8080']
+      - targets: ['rest-api:8080', 'aggregator:8081']

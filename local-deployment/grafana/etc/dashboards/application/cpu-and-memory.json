@@ -127,7 +127,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "process_memory_rss_bytes{instance=\"${deployment}:8080\"}",
+          "expr": "process_memory_rss_bytes{instance=\"${deployment}\"}",
           "legendFormat": "RSS Memory",
           "range": true,
           "refId": "A"
@@ -222,7 +222,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": false,
-          "expr": "jvm_memory_used_bytes{instance=\"${deployment}:8080\"}",
+          "expr": "jvm_memory_used_bytes{instance=\"${deployment}\"}",
           "interval": "",
           "legendFormat": "{{id}}",
           "refId": "Memory Usage"
@@ -318,7 +318,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "process_cpu_usage{instance=\"${deployment}:8080\"}",
+          "expr": "process_cpu_usage{instance=\"${deployment}\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "CPU Load"
@@ -414,7 +414,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "jvm_threads_live_threads{instance=\"${deployment}:8080\"}",
+          "expr": "jvm_threads_live_threads{instance=\"${deployment}\"}",
           "interval": "",
           "legendFormat": "live threads",
           "refId": "Live Threads"
@@ -425,7 +425,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "jvm_threads_daemon_threads{instance=\"${deployment}:8080\"}",
+          "expr": "jvm_threads_daemon_threads{instance=\"${deployment}\"}",
           "hide": false,
           "interval": "",
           "legendFormat": "daemon threads",
@@ -456,12 +456,12 @@
           {
             "selected": false,
             "text": "rest-api",
-            "value": "rest-api"
+            "value": "rest-api:8080"
           },
           {
             "selected": true,
             "text": "aggregator",
-            "value": "aggregator"
+            "value": "aggregator:8081"
           }
         ],
         "query": "rest-api, aggregator",
@@ -493,4 +493,4 @@
   "uid": "0EPScKYnk",
   "version": 1,
   "weekStart": ""
-}g
+}
