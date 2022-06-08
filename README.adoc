@@ -156,7 +156,7 @@ super-simple-storage-solution
 
 === Naming conventions
 
-Each mddule's `artifactId` is constructed by following rules:
+Each module's `artifactId` is constructed by following rules:
 
 * The root module is called `s4`
 * Each module adds its path from the root module as suffix to the name, with hierarchy levels represented by dashes (`-`)
@@ -164,7 +164,7 @@ Each mddule's `artifactId` is constructed by following rules:
 
 So for example, the module residing in folder `super-simple-storage-solution/service/aggregator` is named `s4-services-aggregator`. The module residing in `super-simple-storage-solution/commons` is called `s4-commons-parent`.
 
-Aside from the `artifactId`, each moduel has a name. The rules here are:
+Aside from the `artifactId`, each module has a name. The rules here are:
 
 * the root is called `S4`
 * ach module adds its path from the root module as suffix to the name, with hierarchy levels represented by `::`, surrounded by blanks
@@ -222,7 +222,7 @@ The `<plugins>` section includes plugins used by all modules. Those are currentl
 The dependencies in the `<dependencyManangement>` section are ordered in the following way:
 
 1. Quarkus main dependencies
-2. Quarkiverse depdencies (currently none)
+2. Quarkiverse dependencies (currently none)
 3. Quarkus-dependencies form `S4 {two-colons} Commons`
 4. Non-quarkus dependencies
 5. Test dependencies
