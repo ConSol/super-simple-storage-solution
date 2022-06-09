@@ -22,6 +22,7 @@
         <module>http-exceptions</module>
         <module>opentracing-amqp</module>
         <module>opentracing-messaging</module>
+        <module>citrus-tests</module>
     </modules>
 
     <build>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>s4</artifactId>
+        <groupId>de.consol.dus</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>s4-citrus-tests-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>S4 :: Citrus Tests</name>
+    <description>Citrus tests for integration testing the application</description>
+
+    <modules>
+        <module>continuous</module>
+        <module>torture</module>
+    </modules>
+
+    <properties>
+        <citrus.skip.test.jar>true</citrus.skip.test.jar>
+        <citrus.skip.remote.tests>true</citrus.skip.remote.tests>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-remote-maven-plugin</artifactId>
+                <configuration>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-uber-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <skipTestJar>${citrus.skip.test.jar}</skipTestJar>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>trigger-remote-tests</id>
+                        <configuration>
+                            <skip>${citrus.skip.remote.tests}</skip>
+                            <server>
+                                <url>${citrus.server.url}</url>
+                            </server>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>citrus-tests</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- Citrus -->
+        <!-- Spring Boot for Citrus -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <!-- Logging Setup for Citrus -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${citrus-log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${citrus-log4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Actual Citrus -->
+        <dependency>
+            <groupId>com.consol.citrus</groupId>
+            <artifactId>citrus-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.consol.citrus</groupId>
+            <artifactId>citrus-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.consol.citrus</groupId>
+            <artifactId>citrus-testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- S4 :: Commons :: Citrus Tests -->
+        <dependency>
+            <groupId>de.consol.dus</groupId>
+            <artifactId>s4-commons-citrus-tests-config</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>citrus-remote</id>
+            <properties>
+                <citrus.skip.test.jar>true</citrus.skip.test.jar>
+                <citrus.skip.remote.tests>false</citrus.skip.remote.tests>
+                <citrus.server.url>http://localhost:8070</citrus.server.url>
+            </properties>
+        </profile>
+    </profiles>
+</project>

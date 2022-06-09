@@ -20,5 +20,6 @@
         <module>bom</module>
         <module>commons</module>
         <module>services</module>
+        <module>citrus-tests</module>
     </modules>
 </project>
