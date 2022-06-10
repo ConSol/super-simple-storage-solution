@@ -2,12 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>s4</artifactId>
         <groupId>de.consol.dus</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>s4-citrus-tests-parent</artifactId>
     <packaging>pom</packaging>
@@ -20,12 +21,17 @@
     </modules>
 
     <properties>
-        <citrus.skip.test.jar>true</citrus.skip.test.jar>
+        <citrus.skip.build.uber-jar>false</citrus.skip.build.uber-jar>
+        <citrus.skip.surefire.tests>true</citrus.skip.surefire.tests>
         <citrus.skip.remote.tests>true</citrus.skip.remote.tests>
     </properties>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>com.consol.citrus</groupId>
                 <artifactId>citrus-remote-maven-plugin</artifactId>
@@ -39,7 +45,7 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <skipTestJar>${citrus.skip.test.jar}</skipTestJar>
+                            <skipTestJar>${citrus.skip.build.uber-jar}</skipTestJar>
                         </configuration>
                     </execution>
                     <execution>
@@ -64,6 +70,9 @@
                             <goal>integration-test</goal>
                         </goals>
                         <phase>verify</phase>
+                        <configuration>
+                            <skip>${citrus.skip.surefire.tests}</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -103,6 +112,10 @@
             <artifactId>citrus-testng</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.consol.citrus</groupId>
+            <artifactId>citrus-remote-server</artifactId>
+        </dependency>
         <!-- S4 :: Commons :: Citrus Tests -->
         <dependency>
             <groupId>de.consol.dus</groupId>
@@ -114,9 +127,9 @@
         <profile>
             <id>citrus-remote</id>
             <properties>
-                <citrus.skip.test.jar>true</citrus.skip.test.jar>
+                <citrus.skip.build.uber-jar>true</citrus.skip.build.uber-jar>
                 <citrus.skip.remote.tests>false</citrus.skip.remote.tests>
-                <citrus.server.url>http://localhost:8070</citrus.server.url>
+                <citrus.server.url>http://localhost:4567</citrus.server.url>
             </properties>
         </profile>
     </profiles>

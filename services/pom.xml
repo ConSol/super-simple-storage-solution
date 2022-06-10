@@ -78,7 +78,7 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-logging-gelf</artifactId>
         </dependency>
-        <!-- S4 Common -->
+        <!-- S4 :: Commons -->
         <dependency>
             <groupId>de.consol.dus</groupId>
             <artifactId>s4-commons-correlation</artifactId>

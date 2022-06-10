@@ -2,14 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>s4-citrus-tests-parent</artifactId>
         <groupId>de.consol.dus</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>continuous</artifactId>
+    <artifactId>s4-citrus-tests-continuous</artifactId>
     <name>S4 :: Citrus Tests :: Continuous</name>
 
     <dependencies>
@@ -17,7 +18,7 @@
             <groupId>com.consol.citrus</groupId>
             <artifactId>citrus-validation-json</artifactId>
         </dependency>
-        <!-- S4 :: Commons :: Citrus Test :: REST API Client -->
+        <!-- S4 :: Commons :: Citrus Test -->
         <dependency>
             <groupId>de.consol.dus</groupId>
             <artifactId>s4-commons-citrus-tests-rest-api-client</artifactId>

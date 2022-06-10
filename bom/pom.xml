@@ -185,7 +185,7 @@
                 <artifactId>micrometer-jvm-extras</artifactId>
                 <version>${micrometer-jvm-extras.version}</version>
             </dependency>
-            <!-- S4 Common -->
+            <!-- S4 :: Commons -->
             <dependency>
                 <groupId>de.consol.dus</groupId>
                 <artifactId>s4-commons-correlation</artifactId>
@@ -250,7 +250,7 @@
                 <scope>test</scope>
             </dependency>
 
-            <!-- Commons Citrus Tests -->
+            <!-- S4 :: Commons :: Citrus Tests -->
             <dependency>
                 <groupId>de.consol.dus</groupId>
                 <artifactId>s4-commons-citrus-tests-config</artifactId>

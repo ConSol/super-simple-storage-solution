@@ -25,7 +25,7 @@
             <artifactId>quarkus-hibernate-validator</artifactId>
         </dependency>
 
-        <!-- S4 Common -->
+        <!-- S4 :: Commons -->
         <dependency>
             <groupId>de.consol.dus</groupId>
             <artifactId>s4-commons-correlation</artifactId>

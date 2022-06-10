@@ -7,7 +7,6 @@ import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetAllUpload
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

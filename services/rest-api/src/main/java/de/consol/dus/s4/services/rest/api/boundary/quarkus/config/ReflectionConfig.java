@@ -21,7 +21,6 @@ import de.consol.dus.s4.services.rest.api.usecases.internal.api.EnterProcessingR
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetStatusOfUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.messaging.requests.SendUploadReadyForProcessingRequest;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 @RegisterForReflection(targets = {
     UploadImpl.class,

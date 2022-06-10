@@ -5,10 +5,12 @@ FROM gcr.io/distroless/java17@sha256:e942c49fc2e6f7eacaf4ea6edf12f40f1a2c81454ba
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en"
 
 COPY --chown=185 target/emptydir /deployment
-COPY --chown=185 target/*.jar /deployment/app.jar
+COPY --chown=185 target/quarkus-app/lib/ /deployment/lib/
+COPY --chown=185 target/quarkus-app/*.jar /deployment/
+COPY --chown=185 target/quarkus-app/app/ /deployment/app/
+COPY --chown=185 target/quarkus-app/quarkus/ /deployment/quarkus/
 
 USER 185
 WORKDIR /deployment
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
-
+ENTRYPOINT [ "java", "-jar", "quarkus-run.jar" ]

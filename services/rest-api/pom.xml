@@ -55,7 +55,7 @@
             <groupId>io.opentracing.contrib</groupId>
             <artifactId>opentracing-jdbc</artifactId>
         </dependency>
-        <!-- Commons -->
+        <!-- S4 :: Commons -->
         <dependency>
             <groupId>de.consol.dus</groupId>
             <artifactId>s4-commons-opentracing-amqp</artifactId>
