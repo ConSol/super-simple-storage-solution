@@ -13,12 +13,21 @@ quarkus:
   jaeger:
     enabled: ${TRACING_ENABLED:true}
     endpoint: ${TRACING_ENDPOINT:http://localhost:14268/api/traces}
-    service-name: rest-api
+    service-name: ${APP_NAME:rest-api-app}
     sampler-type: const
     sampler-param: 1
   log:
     console:
       format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X{CorrelationID}] (%t) %s%e%n'
+      json:
+        ~: ${CONSOLE_LOG_JSON:false}
+        additional-field:
+          app:
+            type: String
+            value: ${APP_NAME:rest-api-app}
+          pod:
+            type: String
+            value: ${POD_NAME:rest-api-app-0}
     handler:
       gelf:
         enabled: ${GELF_ENABLED:true}
@@ -28,10 +37,10 @@ quarkus:
         additional-field:
           app:
             type: String
-            value: rest-api
+            value: ${APP_NAME:rest-api-app}
           pod:
             type: String
-            value: ${POD_NAME:rest-api-0}
+            value: ${POD_NAME:rest-api-app-0}
   smallrye-openapi:
     enable: true
     info-title: Super Simple Storage Solution REST API
