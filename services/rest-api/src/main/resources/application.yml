@@ -4,18 +4,12 @@ quarkus:
     username: ${DB_USERNAME:upload}
     password: ${DB_PASSWORD:upload}
     jdbc:
-      driver: io.opentracing.contrib.jdbc.TracingDriver
-      url: jdbc:tracing:${quarkus.datasource.db-kind}://${DB_HOST:localhost:5432}/${DB_NAME:upload}
+      driver: org.postgresql.Driver
+      url: jdbc:${quarkus.datasource.db-kind}://${DB_HOST:localhost:5432}/${DB_NAME:upload}
       min-size: ${DB_MIN_SIZE:2}
       max-size: ${DB_MAX_SIZE:8}
   devservices:
     enabled: false
-  jaeger:
-    enabled: ${TRACING_ENABLED:true}
-    endpoint: ${TRACING_ENDPOINT:http://localhost:14268/api/traces}
-    service-name: ${APP_NAME:rest-api-app}
-    sampler-type: const
-    sampler-param: 1
   log:
     console:
       format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X{CorrelationID}] (%t) %s%e%n'
