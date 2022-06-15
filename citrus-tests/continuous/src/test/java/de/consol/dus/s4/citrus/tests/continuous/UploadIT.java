@@ -93,9 +93,10 @@ public class UploadIT extends TestNGCitrusSpringSupport {
               uploadId,
               correlationId)));
         }
-        runner.$(sleep().milliseconds(config.getSleepBetweenUploadsInMs()));
       } catch (Exception e) {
         runner.$(echo("Caught error: %s".formatted(e)));
+      } finally {
+        runner.$(sleep().milliseconds(config.getSleepBetweenUploadsInMs()));
       }
     }
   }
