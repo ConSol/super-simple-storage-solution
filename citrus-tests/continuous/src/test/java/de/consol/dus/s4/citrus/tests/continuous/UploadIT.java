@@ -38,59 +38,65 @@ public class UploadIT extends TestNGCitrusSpringSupport {
   public void keepUploading(
       @Optional @CitrusResource TestCaseRunner runner,
       @Optional @CitrusResource TestContext context) throws IOException {
-    runner.$(echo(config.getSutUrl()));
     String fileName = "PenPen-%s.png".formatted(UUID.randomUUID());
     while (true) {
-      final UploadResponse result = restApiClient.startUpload(new StartUploadRequest(
-          fileName,
-          runner,
-          context,
-          null));
-      long uploadId = result.getUploadId();
-      final String correlationId = result.getCorrelationId();
-      runner.$(echo("Started upload with id %s (CorrelationId = %s)".formatted(
-          uploadId,
-          correlationId)));
+      try {
+        final UploadResponse result = restApiClient.startUpload(new StartUploadRequest(
+            fileName,
+            runner,
+            context,
+            null));
+        long uploadId = result.getUploadId();
+        final String correlationId = result.getCorrelationId();
+        runner.$(echo("Started upload with id %s (CorrelationId = %s)".formatted(
+            uploadId,
+            correlationId)));
 
-      final String fileNameToLoad = config.getFileToUpload();
-      int parts = config.getNPartsPerUpload();
-      final byte[] fileContentToUpload =
-          new ClassPathResource(config.getFileToUpload()).getInputStream().readAllBytes();
-      restApiClient.uploadFileInParts(new UploadFileInPartsRequest(
-          uploadId,
-          parts,
-          fileContentToUpload,
-          correlationId,
-          runner,
-          context));
-      runner.$(echo("Uploaded file %s in %d parts as %s to upload with id %d (CorrelationID = %s)"
-          .formatted(fileName, parts, fileNameToLoad, uploadId, correlationId)));
+        try {
+          final String fileNameToLoad = config.getFileToUpload();
+          int parts = config.getNPartsPerUpload();
+          final byte[] fileContentToUpload =
+              new ClassPathResource(config.getFileToUpload()).getInputStream().readAllBytes();
+          restApiClient.uploadFileInParts(new UploadFileInPartsRequest(
+              uploadId,
+              parts,
+              fileContentToUpload,
+              correlationId,
+              runner,
+              context));
+          runner.$(
+              echo("Uploaded file %s in %d parts as %s to upload with id %d (CorrelationID = %s)"
+                  .formatted(fileName, parts, fileNameToLoad, uploadId, correlationId)));
 
-      restApiClient.setTotalParts(new SetTotalPartsRequest(
-          uploadId,
-          parts,
-          correlationId,
-          runner,
-          context));
-      runner.$(echo("Set totalParts of upload with id %d (CorrelationID = %s)".formatted(
-          uploadId, correlationId)));
+          restApiClient.setTotalParts(new SetTotalPartsRequest(
+              uploadId,
+              parts,
+              correlationId,
+              runner,
+              context));
+          runner.$(echo("Set totalParts of upload with id %d (CorrelationID = %s)".formatted(
+              uploadId, correlationId)));
 
-      restApiClient.waitForUploadDone(
-          new WaitForUploadDoneRequest(uploadId, correlationId, 10, 100, runner, context));
+          restApiClient.waitForUploadDone(
+              new WaitForUploadDoneRequest(uploadId, correlationId, 10, 100, runner, context));
 
-      restApiClient.getUploadContent(new GetUploadContentRequest(
-          fileName,
-          uploadId,
-          correlationId,
-          runner,
-          context));
-
-      restApiClient.deleteUpload(new DeleteUploadRequest(uploadId, correlationId, runner, context));
-      runner.$(echo("Deleted upload with id %s (CorrelationId = %s)".formatted(
-          uploadId,
-          correlationId)));
-
-      runner.$(sleep().milliseconds(config.getSleepBetweenUploadsInMs()));
+          restApiClient.getUploadContent(new GetUploadContentRequest(
+              fileName,
+              uploadId,
+              correlationId,
+              runner,
+              context));
+        } finally {
+          restApiClient.deleteUpload(
+              new DeleteUploadRequest(uploadId, correlationId, runner, context));
+          runner.$(echo("Deleted upload with id %s (CorrelationId = %s)".formatted(
+              uploadId,
+              correlationId)));
+        }
+        runner.$(sleep().milliseconds(config.getSleepBetweenUploadsInMs()));
+      } catch (Exception e) {
+        runner.$(echo("Caught error: %s".formatted(e)));
+      }
     }
   }
 }
