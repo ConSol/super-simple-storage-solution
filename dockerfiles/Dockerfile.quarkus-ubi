@@ -1,0 +1,14 @@
+FROM registry.access.redhat.com/ubi8/openjdk-17@sha256:eea016e9e3d7da20822d7e62ab6566a5b2084c73f598b8379cec977dd08fbf65
+
+ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en"
+
+COPY --chown=185 target/emptydir /deployment
+COPY --chown=185 target/quarkus-app/lib/ /deployment/lib/
+COPY --chown=185 target/quarkus-app/*.jar /deployment/
+COPY --chown=185 target/quarkus-app/app/ /deployment/app/
+COPY --chown=185 target/quarkus-app/quarkus/ /deployment/quarkus/
+
+USER 185
+WORKDIR /deployment
+
+ENTRYPOINT [ "java", "-jar", "quarkus-run.jar" ]

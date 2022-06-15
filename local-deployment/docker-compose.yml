@@ -7,7 +7,7 @@ services:
       - services
     build:
       context: ../services/rest-api
-      dockerfile: ../../dockerfiles/Dockerfile.quarkus-distroless
+      dockerfile: ../../dockerfiles/Dockerfile.quarkus-ubi
     deploy:
       resources:
         limits:
@@ -27,7 +27,7 @@ services:
       - services
     build:
       context: ../services/aggregator
-      dockerfile: ../../dockerfiles/Dockerfile.quarkus-distroless
+      dockerfile: ../../dockerfiles/Dockerfile.quarkus-ubi
     deploy:
       resources:
         limits:
@@ -49,7 +49,7 @@ services:
       - debug-services
     build:
       context: ../services/rest-api
-      dockerfile: ../../dockerfiles/Dockerfile.quarkus-distroless
+      dockerfile: ../../dockerfiles/Dockerfile.quarkus-ubi
     env_file: services/rest-api/.dev.env
     ports:
       - '8080:8080'
@@ -65,7 +65,7 @@ services:
       - debug-services
     build:
       context: ../services/aggregator
-      dockerfile: ../../dockerfiles/Dockerfile.quarkus-distroless
+      dockerfile: ../../dockerfiles/Dockerfile.quarkus-ubi
     env_file: services/aggregator/.dev.env
     ports:
       - '8081:8080'
