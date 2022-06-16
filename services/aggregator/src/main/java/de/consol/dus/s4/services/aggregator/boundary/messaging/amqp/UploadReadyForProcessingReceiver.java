@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 @ApplicationScoped
 public class UploadReadyForProcessingReceiver extends TracedAmqpReceiver<UploadReadyForProcessing> {
 
-  protected static final String SOURCE = "amqp-upload-ready-for-processing-incoming";
+  protected static final String SOURCE = "aggregator";
 
   public UploadReadyForProcessingReceiver(Tracer tracer, Logger logger) {
     super(tracer, logger);
