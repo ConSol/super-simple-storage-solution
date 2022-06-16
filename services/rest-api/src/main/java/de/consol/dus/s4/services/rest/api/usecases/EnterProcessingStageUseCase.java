@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.microprofile.opentracing.Traced;
 import org.slf4j.Logger;
 
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class EnterProcessingStageUseCase {
   private final Logger logger;
   private final UploadReadyForProcessingEmitter emitter;
 
+  @Traced
   public void execute(EnterProcessingRequest request) {
     try {
       logger.info("Received request: {}", request);

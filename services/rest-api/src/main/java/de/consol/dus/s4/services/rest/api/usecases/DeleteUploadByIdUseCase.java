@@ -6,6 +6,7 @@ import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.microprofile.opentracing.Traced;
 import org.slf4j.Logger;
 
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class DeleteUploadByIdUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
+  @Traced
   public void execute(DeleteUploadByIdRequest request) {
     logger.info("Received request: {}", request);
     dao.deleteById(request);

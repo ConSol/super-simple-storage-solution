@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.microprofile.opentracing.Traced;
 import org.slf4j.Logger;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -22,6 +23,7 @@ public class SetTotalPartsUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
+  @Traced
   public Optional<Upload> execute(SetTotalPartsForUploadRequest request)
       throws TotalPartsAlreadySetException, TotalPartsSmallerThanMaxPartNumberException {
     logger.info("Received request: {}", request);
