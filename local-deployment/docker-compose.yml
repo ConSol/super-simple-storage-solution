@@ -129,7 +129,7 @@ services:
       - tests
     build:
       context: ../citrus-tests/continuous
-      dockerfile: ../../dockerfiles/Dockerfile.distroless
+      dockerfile: ../../dockerfiles/Dockerfile.ubi
     env_file: citrus/continuous/.env
     command:
       - "--engine"
