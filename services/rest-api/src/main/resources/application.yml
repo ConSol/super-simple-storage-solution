@@ -73,7 +73,7 @@ quarkus:
 mp:
   messaging:
     outgoing:
-      aggregator:
+      amqp-upload-ready-for-processing-outgoing:
         address: upload-ready-for-processing
         connector: smallrye-amqp
         durable: true
