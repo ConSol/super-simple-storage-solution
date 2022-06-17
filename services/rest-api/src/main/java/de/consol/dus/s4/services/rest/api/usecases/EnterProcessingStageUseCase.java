@@ -27,7 +27,7 @@ public class EnterProcessingStageUseCase {
   @Traced
   public void execute(EnterProcessingRequest request) {
     try {
-      logger.info("Received request: {}", request);
+      logger.warn("Received request: {}", request);
       final long id = request.getId();
       if (updateCanBeProcessed(request)) {
         logger.debug("Request: {}: Upload with id {} is ready for processing", request, id);

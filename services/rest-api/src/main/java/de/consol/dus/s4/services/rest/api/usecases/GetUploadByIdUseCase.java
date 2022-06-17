@@ -21,7 +21,7 @@ public class GetUploadByIdUseCase {
 
   @Traced
   public Optional<Upload> execute(GetUploadByIdRequest request) {
-    logger.info("Received request: {}", request);
+    logger.warn("Received request: {}", request);
     return dao.getById(request).map(Upload.class::cast);
   }
 

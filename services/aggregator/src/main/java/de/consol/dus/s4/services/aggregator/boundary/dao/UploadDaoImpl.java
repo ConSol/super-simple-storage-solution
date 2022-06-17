@@ -31,7 +31,7 @@ public class UploadDaoImpl implements UploadDao {
       WriteContentAndReleasePartsRequest request) {
     final Optional<UploadEntity> maybeUpload = repository.findById(request.getId());
     if (maybeUpload.isEmpty()) {
-      logger.info("Request {}: Upload with id {} does not exist", request, request.getId());
+      logger.warn("Request {}: Upload with id {} does not exist", request, request.getId());
       return;
     }
     final UploadEntity upload = maybeUpload.get().setContent(request.getContent());

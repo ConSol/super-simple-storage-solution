@@ -26,7 +26,7 @@ public class SetTotalPartsUseCase {
   @Traced
   public Optional<Upload> execute(SetTotalPartsForUploadRequest request)
       throws TotalPartsAlreadySetException, TotalPartsSmallerThanMaxPartNumberException {
-    logger.info("Received request: {}", request);
+    logger.warn("Received request: {}", request);
     final int totalPartsFromRequest = request.getTotalParts();
     final Optional<? extends Upload> maybeUpload = dao.getById(request);
     if (maybeUpload.isEmpty()) {
@@ -45,7 +45,7 @@ public class SetTotalPartsUseCase {
       int totalPartsFromRequest,
       Upload upload) throws TotalPartsAlreadySetException {
     if (Objects.nonNull(upload.getTotalParts())) {
-      logger.info(
+      logger.warn(
           "Request {}: totalParts for Upload with id {} already set (requested: {}, actual: {})",
           request,
           upload.getId(),
@@ -68,7 +68,7 @@ public class SetTotalPartsUseCase {
         .max()
         .orElse(0);
     if (totalPartsFromRequest < maxPartNumber) {
-      logger.info(
+      logger.warn(
           "Request {}: upload with id {} already has a part with partNumber {}, hence totalParts "
               + "cannot be set to {}",
           request,
