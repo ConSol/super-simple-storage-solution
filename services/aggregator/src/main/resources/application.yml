@@ -21,28 +21,13 @@ quarkus:
   log:
     console:
       format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X{CorrelationID}] (%t) %s%e%n'
-      json:
-        ~: ${CONSOLE_LOG_JSON:false}
-        additional-field:
-          app:
-            type: String
-            value: ${APP_NAME:aggregator-app}
-          pod:
-            type: String
-            value: ${POD_NAME:rest-api-app-0}
+      json: ${CONSOLE_LOG_JSON:false}
     handler:
       gelf:
         enabled: ${GELF_ENABLED:true}
         include-full-mdc: true
         host: ${GELF_HOST:localhost}
         port: ${GELF_PORT:12201}
-        additional-field:
-          app:
-            type: String
-            value: ${APP_NAME:aggregator-app}
-          pod:
-            type: String
-            value: ${POD_NAME:aggregator-app-0}
 mp:
   messaging:
     incoming:
