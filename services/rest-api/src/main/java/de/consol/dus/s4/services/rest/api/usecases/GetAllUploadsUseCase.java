@@ -21,7 +21,7 @@ public class GetAllUploadsUseCase {
 
   @Traced
   public Collection<Upload> execute(GetAllUploadsRequest request) {
-    logger.warn("Received request: {}", request);
+    logger.info("Received request: {}", request);
     return dao.getAll(request).stream()
         .map(Upload.class::cast)
         .toList();

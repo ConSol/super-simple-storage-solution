@@ -18,7 +18,7 @@ public class DeleteUploadByIdUseCase {
 
   @Traced
   public void execute(DeleteUploadByIdRequest request) {
-    logger.warn("Received request: {}", request);
+    logger.info("Received request: {}", request);
     dao.deleteById(request);
   }
 

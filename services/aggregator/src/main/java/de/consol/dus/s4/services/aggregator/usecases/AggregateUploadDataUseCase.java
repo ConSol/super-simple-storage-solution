@@ -27,10 +27,10 @@ public class AggregateUploadDataUseCase {
 
   @Traced
   public void execute(AggregateUploadDataRequest request) {
-    logger.warn("Received request: {}", request);
+    logger.info("Received request: {}", request);
     final Optional<Upload> maybeUpload = dao.getById(request);
     if (maybeUpload.isEmpty()) {
-      logger.warn("Request {}: Upload with id {} does not exist", request, request.getId());
+      logger.info("Request {}: Upload with id {} does not exist", request, request.getId());
       return;
     }
     final Upload upload = maybeUpload.get();

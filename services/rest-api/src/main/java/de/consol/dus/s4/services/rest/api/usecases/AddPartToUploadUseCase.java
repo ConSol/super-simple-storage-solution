@@ -25,7 +25,7 @@ public final class AddPartToUploadUseCase {
   @Traced
   public Optional<Upload> execute(AddPartToUploadRequest request)
       throws PartNumberAlreadyExistsException, PartNumberIsBiggerThanTotalParts {
-    logger.warn("Received request: {}", request);
+    logger.info("Received request: {}", request);
     return dao.addPartToUpload(request)
         .map(new EnterProcessingRequest(request.getId(), request.getCorrelationId())::execute)
         .map(Upload.class::cast);

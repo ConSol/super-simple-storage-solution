@@ -20,7 +20,7 @@ public class CreateNewUploadUseCase {
 
   @Traced
   public Upload execute(CreateNewUploadRequest request) {
-    logger.warn("Received request: {}", request);
+    logger.info("Received request: {}", request);
     return dao.createNewUpload(request);
   }
 
