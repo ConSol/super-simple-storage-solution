@@ -29,6 +29,7 @@
         <archunit.version>0.23.1</archunit.version>
         <citrus.version>3.2.1</citrus.version>
         <citrus-log4j.version>2.17.2</citrus-log4j.version>
+        <citrus-log4j2-ecs-layout.version>1.4.0</citrus-log4j2-ecs-layout.version>
         <citrus-spring-test.version>5.3.15</citrus-spring-test.version>
         <org.projectlombok.version>1.18.20</org.projectlombok.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
@@ -230,6 +231,25 @@
                 <scope>test</scope>
             </dependency>
             <!-- Citrus Test Setup -->
+            <!-- Logging Setup for Citrus -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${citrus-log4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${citrus-log4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>co.elastic.logging</groupId>
+                <artifactId>log4j2-ecs-layout</artifactId>
+                <version>${citrus-log4j2-ecs-layout.version}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
