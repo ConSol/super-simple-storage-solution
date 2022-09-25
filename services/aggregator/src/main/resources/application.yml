@@ -24,6 +24,8 @@ quarkus:
         include-full-mdc: true
         host: ${GELF_HOST:localhost}
         port: ${GELF_PORT:12201}
+  native:
+    additional-build-args: -J-Xmx4g
   opentelemetry:
     enabled: true
     tracer:

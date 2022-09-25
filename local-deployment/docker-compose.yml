@@ -213,7 +213,7 @@ services:
       - default
       - jaeger
 
-  # prometheus & grafana
+  # prometheus & grana
   prometheus:
     # v2.36.0
     image: prom/prometheus@sha256:c833de2399020386dc1e886363467f60b7f8e404aef5eaa7a757d6968cf5147b
@@ -240,42 +240,60 @@ services:
 
   # ELK-stack
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
-    profiles:
-      - elk
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:${ELK_VERSION}
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
       discovery.type: single-node
       ES_JAVA_OPTS: -Xms512m -Xmx512m
-    networks: 
+    networks:
       - logging
   logstash:
-    image: docker.elastic.co/logstash/logstash-oss:7.10.2
-    profiles:
-      - elk
+    image: docker.elastic.co/logstash/logstash-oss:${ELK_VERSION}
     volumes:
-      - ${REMOTE_PROJECT_PATH:-.}/logstash/usr/share/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - source: ${REMOTE_PROJECT_PATH:-.}/logstash/usr/share/logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        type: bind
+        read_only: true
     depends_on:
       - elasticsearch
     ports:
       - "12201:12201/udp"
       - "5000:5000"
+      - "5044:5044"
       - "9600:9600"
-    networks: 
-      - default
+    networks:
       - logging
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.10.2
-    profiles:
-      - elk
+    image: docker.elastic.co/kibana/kibana-oss:${ELK_VERSION}
     depends_on:
       - elasticsearch
     ports:
       - "5601:5601"
-    networks: 
+    networks:
       - logging
+  filebeat:
+    image: docker.elastic.co/beats/filebeat-oss:${ELK_VERSION}
+    user: root
+    volumes:
+      - source: ${REMOTE_PROJECT_PATH:-.}/filebeat/usr/share/filebeat/filebeat.yml
+        target: /usr/share/filebeat/filebeat.yml
+        type: bind
+        read_only: true
+      - source: /var/lib/docker
+        target: /var/lib/docker
+        type: bind
+        read_only: true
+      - source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        type: bind
+    command: [ "-e", "-strict.perms=false" ]
+    networks:
+      - logging
+    depends_on:
+      - logstash
+
 
 networks:
   default:
