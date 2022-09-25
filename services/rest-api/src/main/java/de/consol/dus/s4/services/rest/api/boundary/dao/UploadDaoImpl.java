@@ -63,8 +63,7 @@ public class UploadDaoImpl implements UploadDao {
       if (isConstraintViolationException) {
         throw new PartNumberAlreadyExistsException(
             request.getId(),
-            request.getPartNumber(),
-            request.getCorrelationId());
+            request.getPartNumber());
       }
       throw exception;
     }
@@ -84,8 +83,7 @@ public class UploadDaoImpl implements UploadDao {
       throw new PartNumberIsBiggerThanTotalParts(
           existing.getId(),
           totalParts,
-          request.getPartNumber(),
-          request.getCorrelationId());
+          request.getPartNumber());
     }
     existing.getParts().add(new UploadPartEntity()
         .setUpload(existing)

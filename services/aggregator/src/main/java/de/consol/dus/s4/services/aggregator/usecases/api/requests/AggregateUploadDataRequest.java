@@ -5,6 +5,6 @@ import de.consol.dus.s4.services.aggregator.usecases.spi.dao.requests.GetUploadB
 
 public interface AggregateUploadDataRequest extends GetUploadByIdRequest {
   default void execute() {
-    AggregateUploadDataUseCase.getInitializedInstance(getCorrelationId()).execute(this);
+    AggregateUploadDataUseCase.getInitializedInstance().execute(this);
   }
 }

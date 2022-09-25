@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.microprofile.opentracing.Traced;
 import org.slf4j.Logger;
 
 @RequiredArgsConstructor
@@ -25,7 +24,6 @@ public class AggregateUploadDataUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
-  @Traced
   public void execute(AggregateUploadDataRequest request) {
     logger.info("Received request: {}", request);
     final Optional<Upload> maybeUpload = dao.getById(request);
@@ -38,8 +36,7 @@ public class AggregateUploadDataUseCase {
       final byte[] content = aggregateContent(upload);
       dao.writeContentAndDeletePartsAndSetStatusToDone(new WriteContentAndReleasePartsRequest(
           request.getId(),
-          content,
-          request.getCorrelationId()));
+          content));
     }
   }
 
@@ -117,11 +114,11 @@ public class AggregateUploadDataUseCase {
     return true;
   }
 
-  public static AggregateUploadDataUseCase getInitializedInstance(String correlationId) {
+  public static AggregateUploadDataUseCase getInitializedInstance() {
     try {
       return getInstance(null, null);
     } catch (IllegalStateException cause) {
-      throw new SingletonNotInitializedError(cause, correlationId);
+      throw new SingletonNotInitializedError(cause);
     }
   }
 

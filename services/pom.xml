@@ -85,15 +85,15 @@
         <!-- S4 :: Commons -->
         <dependency>
             <groupId>de.consol.dus</groupId>
-            <artifactId>s4-commons-correlation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.consol.dus</groupId>
             <artifactId>s4-commons-correlation-http</artifactId>
         </dependency>
         <dependency>
             <groupId>de.consol.dus</groupId>
             <artifactId>s4-commons-http-exceptions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.consol.dus</groupId>
+            <artifactId>s4-commons-logger-injection</artifactId>
         </dependency>
         <dependency>
             <groupId>de.consol.dus</groupId>

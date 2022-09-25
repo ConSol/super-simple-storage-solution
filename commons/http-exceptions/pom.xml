@@ -24,12 +24,6 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-validator</artifactId>
         </dependency>
-
-        <!-- S4 :: Commons -->
-        <dependency>
-            <groupId>de.consol.dus</groupId>
-            <artifactId>s4-commons-correlation</artifactId>
-        </dependency>
     </dependencies>
 
     <packaging>jar</packaging>

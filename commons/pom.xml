@@ -17,9 +17,10 @@
     <packaging>pom</packaging>
     <modules>
         <module>micrometer-jvm-extras</module>
-        <module>correlation</module>
         <module>correlation-http</module>
         <module>http-exceptions</module>
+        <module>logger-injection</module>
+        <module>opentelemetry-amqp</module>
         <module>opentracing-amqp</module>
         <module>opentracing-messaging</module>
         <module>citrus-tests</module>

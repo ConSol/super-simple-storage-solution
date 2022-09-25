@@ -7,6 +7,6 @@ public interface CreateNewUploadRequest extends
     de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.CreateNewUploadRequest {
 
   default Upload execute() {
-    return CreateNewUploadUseCase.getInitializedInstance(getCorrelationId()).execute(this);
+    return CreateNewUploadUseCase.getInitializedInstance().execute(this);
   }
 }

@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.microprofile.opentracing.Traced;
 import org.slf4j.Logger;
 
 @RequiredArgsConstructor
@@ -24,7 +23,6 @@ public class EnterProcessingStageUseCase {
   private final Logger logger;
   private final UploadReadyForProcessingEmitter emitter;
 
-  @Traced
   public void execute(EnterProcessingRequest request) {
     try {
       logger.info("Received request: {}", request);
@@ -32,7 +30,7 @@ public class EnterProcessingStageUseCase {
       if (updateCanBeProcessed(request)) {
         logger.debug("Request: {}: Upload with id {} is ready for processing", request, id);
         setStatusToProcessing(request);
-        emitter.emit(new SendUploadReadyForProcessingRequest(id, request.getCorrelationId()));
+        emitter.emit(new SendUploadReadyForProcessingRequest(id));
       }
     } catch (Exception e) {
       logger.error("Request {}: error occurred", request, e);
@@ -107,15 +105,14 @@ public class EnterProcessingStageUseCase {
   private void setStatusToProcessing(EnterProcessingRequest request) {
     dao.setStatusOfUpload(new SetStatusOfUploadRequest(
         request.getId(),
-        UploadStatus.PROCESSING,
-        request.getCorrelationId()));
+        UploadStatus.PROCESSING));
   }
 
-  public static EnterProcessingStageUseCase getInitializedInstance(String correlationId) {
+  public static EnterProcessingStageUseCase getInitializedInstance() {
     try {
       return getInstance(null, null, null);
     } catch (IllegalStateException cause) {
-      throw new SingletonNotInitializedError(cause, correlationId);
+      throw new SingletonNotInitializedError(cause);
     }
   }
 

@@ -10,11 +10,11 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>s4-commons-correlation</artifactId>
-    <name>S4 :: Commons :: Correlation</name>
-    <description>Provides functionality around correlation Ids (I/O-agnostic)</description>
-
     <packaging>jar</packaging>
+
+    <artifactId>s4-commons-logger-injection</artifactId>
+    <name>S4 :: Commons :: Logger Injection</name>
+    <description>Module to allow Logger injection</description>
 
     <dependencies>
         <dependency>
@@ -22,4 +22,5 @@
             <artifactId>quarkus-arc</artifactId>
         </dependency>
     </dependencies>
+
 </project>

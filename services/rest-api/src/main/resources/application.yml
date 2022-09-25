@@ -4,28 +4,30 @@ quarkus:
     username: ${DB_USERNAME:upload}
     password: ${DB_PASSWORD:upload}
     jdbc:
-      driver: io.opentracing.contrib.jdbc.TracingDriver
-      url: jdbc:tracing:${quarkus.datasource.db-kind}://${DB_HOST:localhost:5432}/${DB_NAME:upload}
+      driver: io.opentelemetry.instrumentation.jdbc.OpenTelemetryDriver
+      url: jdbc:otel:${quarkus.datasource.db-kind}://${DB_HOST:localhost:5432}/${DB_NAME:upload}
       min-size: ${DB_MIN_SIZE:2}
       max-size: ${DB_MAX_SIZE:8}
   devservices:
     enabled: false
-  jaeger:
-    enabled: ${TRACING_ENABLED:true}
-    endpoint: ${TRACING_ENDPOINT:http://localhost:14268/api/traces}
-    service-name: ${APP_NAME:rest-api-app}
-    sampler-type: const
-    sampler-param: 1
+  hibernate-orm:
+    dialect: org.hibernate.dialect.PostgreSQLDialect
   log:
     console:
-      format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X{CorrelationID}] (%t) %s%e%n'
+      format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X] (%t) %s%e%n'
       json: ${CONSOLE_LOG_JSON:false}
     handler:
       gelf:
-        enabled: ${GELF_ENABLED:true}
+        enabled: ${GELF_ENABLED:false}
         include-full-mdc: true
         host: ${GELF_HOST:localhost}
         port: ${GELF_PORT:12201}
+  opentelemetry:
+    enabled: true
+    tracer:
+      exporter:
+        otlp:
+          endpoint: ${OTLP_HOST:http://localhost:4317}
   smallrye-openapi:
     enable: true
     info-title: Super Simple Storage Solution REST API

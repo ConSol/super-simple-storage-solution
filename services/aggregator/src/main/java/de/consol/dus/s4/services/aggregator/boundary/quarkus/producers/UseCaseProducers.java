@@ -1,12 +1,12 @@
 package de.consol.dus.s4.services.aggregator.boundary.quarkus.producers;
 
-import de.consol.dus.s4.commons.correlation.logging.logger.CorrelationLogger;
 import de.consol.dus.s4.services.aggregator.usecases.AggregateUploadDataUseCase;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.UploadDao;
 import io.quarkus.runtime.Startup;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -17,6 +17,6 @@ public class UseCaseProducers {
   @Produces
   public AggregateUploadDataUseCase enterProcessingStageUseCase() {
     return AggregateUploadDataUseCase
-        .getInstance(uploadDao, new CorrelationLogger(AggregateUploadDataUseCase.class));
+        .getInstance(uploadDao, LoggerFactory.getLogger(AggregateUploadDataUseCase.class));
   }
 }

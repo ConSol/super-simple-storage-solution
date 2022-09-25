@@ -19,6 +19,7 @@ import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsAlre
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsSmallerThanMaxPartNumberException;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.UploadPart;
+import io.opentelemetry.api.trace.Span;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
@@ -45,6 +46,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.jboss.resteasy.reactive.MultipartForm;
+import org.slf4j.MDC;
 
 @Path("uploads")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -59,6 +61,9 @@ public class UploadEndpoint {
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       String correlationId) {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     final Collection<Upload> results = new GetAllUploadsRequestImpl(correlationId).execute();
     return Response
         .ok(results.stream()
@@ -86,6 +91,9 @@ public class UploadEndpoint {
       @RequestBody(ref = "StartUploadRequest")
       @Valid
       @NotNull StartUploadRequest request) {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     final Upload result =
         new CreateNewUploadRequestImpl(request.getFileName(), correlationId).execute();
     return Response
@@ -113,6 +121,9 @@ public class UploadEndpoint {
       @Parameter(ref = "id")
       @PathParam("id")
       long id) throws NoSuchEntityException {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     final Upload result = new GetUploadByIdRequestImpl(id, correlationId).execute()
         .orElseThrow(() -> new NoSuchEntityException(Upload.class, id));
     return Response
@@ -140,6 +151,9 @@ public class UploadEndpoint {
       @Parameter(ref = "id")
       @PathParam("id")
       long id) {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     new DeleteUploadByIdRequestImpl(id, correlationId).execute();
     return Response.noContent().build();
   }
@@ -176,6 +190,9 @@ public class UploadEndpoint {
       @NotNull
       SetTotalPartsOfUploadRequest request)
       throws NoSuchEntityException, ConflictException {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     final Upload result;
     try {
       result = new SetTotalPartsForUploadRequestImpl(id, request.getTotalParts(), correlationId)
@@ -213,6 +230,9 @@ public class UploadEndpoint {
       @Parameter(ref = "id")
       @PathParam("id")
       long id) {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     return Response
         .ok(new GetUploadByIdRequestImpl(id, correlationId).execute()
             .map(Upload::getParts)
@@ -254,6 +274,9 @@ public class UploadEndpoint {
       @NotNull
       AddPartToUploadRequest request)
       throws IOException, NoSuchEntityException, ConflictException {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     final Upload result;
     try {
       // @formatter:off
@@ -312,6 +335,9 @@ public class UploadEndpoint {
       @PathParam("partNumber")
       @Valid @Min(value = 1)
       int partNumber) {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     return Response
         .ok(new GetUploadByIdRequestImpl(id, correlationId).execute()
             .orElseThrow(() -> new NoSuchEntityException(Upload.class, id))
@@ -355,6 +381,9 @@ public class UploadEndpoint {
       @Parameter(ref = "id")
       @PathParam("id")
       long id) {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     final Upload result = new GetUploadByIdRequestImpl(id, correlationId).execute()
         .orElseThrow(() -> new NoSuchEntityException(Upload.class, id));
     final byte[] content = result.getContent();

@@ -1,6 +1,5 @@
 package de.consol.dus.s4.services.rest.api.boundary.quarkus.producers;
 
-import de.consol.dus.s4.commons.correlation.logging.logger.CorrelationLogger;
 import de.consol.dus.s4.services.rest.api.usecases.AddPartToUploadUseCase;
 import de.consol.dus.s4.services.rest.api.usecases.CreateNewUploadUseCase;
 import de.consol.dus.s4.services.rest.api.usecases.DeleteUploadByIdUseCase;
@@ -14,6 +13,8 @@ import io.quarkus.runtime.Startup;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -71,7 +72,7 @@ public class UseCaseProducers {
         .getInstance(uploadDao, getLoggerForClass(EnterProcessingStageUseCase.class), emitter);
   }
 
-  private CorrelationLogger getLoggerForClass(Class<?> clazz) {
-    return new CorrelationLogger(clazz);
+  private Logger getLoggerForClass(Class<?> clazz) {
+    return LoggerFactory.getLogger(clazz);
   }
 }

@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.microprofile.opentracing.Traced;
 import org.slf4j.Logger;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -22,20 +21,19 @@ public final class AddPartToUploadUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
-  @Traced
   public Optional<Upload> execute(AddPartToUploadRequest request)
       throws PartNumberAlreadyExistsException, PartNumberIsBiggerThanTotalParts {
     logger.info("Received request: {}", request);
     return dao.addPartToUpload(request)
-        .map(new EnterProcessingRequest(request.getId(), request.getCorrelationId())::execute)
+        .map(new EnterProcessingRequest(request.getId())::execute)
         .map(Upload.class::cast);
   }
 
-  public static AddPartToUploadUseCase getInitializedInstance(String correlationId) {
+  public static AddPartToUploadUseCase getInitializedInstance() {
     try {
       return getInstance(null, null);
     } catch (IllegalStateException cause) {
-      throw new SingletonNotInitializedError(cause, correlationId);
+      throw new SingletonNotInitializedError(cause);
     }
   }
 

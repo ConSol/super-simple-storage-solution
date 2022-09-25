@@ -11,6 +11,6 @@ public interface AddPartToUploadRequest extends
 
   default Optional<Upload> execute()
       throws PartNumberAlreadyExistsException, PartNumberIsBiggerThanTotalParts {
-    return AddPartToUploadUseCase.getInitializedInstance(getCorrelationId()).execute(this);
+    return AddPartToUploadUseCase.getInitializedInstance().execute(this);
   }
 }

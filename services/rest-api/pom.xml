@@ -50,15 +50,15 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-flyway</artifactId>
         </dependency>
-        <!-- Tracing -->
+        <!-- OpenTelemetry -->
         <dependency>
-            <groupId>io.opentracing.contrib</groupId>
-            <artifactId>opentracing-jdbc</artifactId>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-jdbc</artifactId>
         </dependency>
         <!-- S4 :: Commons -->
         <dependency>
             <groupId>de.consol.dus</groupId>
-            <artifactId>s4-commons-opentracing-amqp</artifactId>
+            <artifactId>s4-commons-opentelemetry-amqp</artifactId>
         </dependency>
     </dependencies>
 

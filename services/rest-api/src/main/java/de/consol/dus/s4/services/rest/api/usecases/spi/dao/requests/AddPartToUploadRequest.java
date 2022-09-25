@@ -1,8 +1,6 @@
 package de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests;
 
-import de.consol.dus.s4.commons.correlation.Correlated;
-
-public interface AddPartToUploadRequest extends Correlated {
+public interface AddPartToUploadRequest {
   long getId();
 
   int getPartNumber();

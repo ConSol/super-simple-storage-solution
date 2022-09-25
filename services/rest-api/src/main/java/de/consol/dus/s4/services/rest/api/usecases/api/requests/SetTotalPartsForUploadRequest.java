@@ -13,6 +13,6 @@ public interface SetTotalPartsForUploadRequest extends GetUploadByIdRequest,
 
   default Optional<Upload> execute()
       throws TotalPartsAlreadySetException, TotalPartsSmallerThanMaxPartNumberException {
-    return SetTotalPartsUseCase.getInitializedInstance(getCorrelationId()).execute(this);
+    return SetTotalPartsUseCase.getInitializedInstance().execute(this);
   }
 }

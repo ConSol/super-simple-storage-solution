@@ -17,7 +17,6 @@ import de.consol.dus.s4.citrus.tests.client.request.UploadFileInPartsRequest;
 import de.consol.dus.s4.citrus.tests.client.request.WaitForUploadDoneRequest;
 import de.consol.dus.s4.citrus.tests.client.response.UploadResponse;
 import de.consol.dus.s4.citrus.tests.continuous.configuration.tests.TestConfig;
-import java.io.IOException;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -26,9 +25,11 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 public class UploadIT extends TestNGCitrusSpringSupport {
+  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private TestConfig config;
 
+  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private RestApiClient restApiClient;
 
@@ -37,7 +38,7 @@ public class UploadIT extends TestNGCitrusSpringSupport {
   @CitrusTest
   public void keepUploading(
       @Optional @CitrusResource TestCaseRunner runner,
-      @Optional @CitrusResource TestContext context) throws IOException {
+      @Optional @CitrusResource TestContext context) {
     String fileName = "PenPen-%s.png".formatted(UUID.randomUUID());
     while (true) {
       try {

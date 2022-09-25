@@ -7,7 +7,7 @@ services:
       - services
     build:
       context: ../services/rest-api
-      dockerfile: ../../dockerfiles/Dockerfile.quarkus-ubi
+      dockerfile: ../../dockerfiles/Dockerfile.distroless
     deploy:
       resources:
         limits:
@@ -27,7 +27,7 @@ services:
       - services
     build:
       context: ../services/aggregator
-      dockerfile: ../../dockerfiles/Dockerfile.quarkus-ubi
+      dockerfile: ../../dockerfiles/Dockerfile.distroless
     deploy:
       resources:
         limits:
@@ -49,7 +49,7 @@ services:
       - debug-services
     build:
       context: ../services/rest-api
-      dockerfile: ../../dockerfiles/Dockerfile.quarkus-ubi
+      dockerfile: ../../dockerfiles/Dockerfile.distroless
     env_file: services/rest-api/.dev.env
     ports:
       - '8080:8080'
@@ -65,7 +65,7 @@ services:
       - debug-services
     build:
       context: ../services/aggregator
-      dockerfile: ../../dockerfiles/Dockerfile.quarkus-ubi
+      dockerfile: ../../dockerfiles/Dockerfile.distroless
     env_file: services/aggregator/.dev.env
     ports:
       - '8081:8080'
@@ -187,13 +187,31 @@ services:
       ARTEMIS_USERNAME: artemis
       ARTEMIS_PASSWORD: artemis
 
-  # jaeger
+  # jaeger & otel collector
   jaeger:
     # 1.35.1
     image: jaegertracing/all-in-one@sha256:f111f6ced1d3cc38eb102e278a87470644dba005c838f34ae92e375ab4bc21a4
     ports:
       - "14268:14268"
+      - "14250:14250"
       - "16686:16686"
+    networks:
+      - jaeger
+  otel-collector:
+    # 0.45.0
+    image: otel/opentelemetry-collector@sha256:c4bbbdbd0194d5c9e361c3ed72b2e301dd23b886b98c1c1c9fb261bd60cb90d8
+    command: [ "--config=/etc/otel-collector-config.yml" ]
+    volumes:
+      - ${REMOTE_PROJECT_PATH:-.}/otel-collector/etc/otel-collector-config.yml:/etc/otel-collector-config.yml:ro
+    ports:
+      - "13133:13133" # Health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "55680:55680" # OTLP gRPC receiver alternative port
+    depends_on:
+      - jaeger
+    networks:
+      - default
+      - jaeger
 
   # prometheus & grafana
   prometheus:
@@ -223,6 +241,8 @@ services:
   # ELK-stack
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    profiles:
+      - elk
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -233,6 +253,8 @@ services:
       - logging
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:7.10.2
+    profiles:
+      - elk
     volumes:
       - ${REMOTE_PROJECT_PATH:-.}/logstash/usr/share/logstash/pipeline:/usr/share/logstash/pipeline:ro
     depends_on:
@@ -246,6 +268,8 @@ services:
       - logging
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:7.10.2
+    profiles:
+      - elk
     depends_on:
       - elasticsearch
     ports:
@@ -255,6 +279,8 @@ services:
 
 networks:
   default:
+    driver: bridge
   database:
-  monitoring:
+  jaeger:
   logging:
+  monitoring:

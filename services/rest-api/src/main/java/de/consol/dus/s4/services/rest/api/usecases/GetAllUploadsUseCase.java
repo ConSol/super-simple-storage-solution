@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.microprofile.opentracing.Traced;
 import org.slf4j.Logger;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,7 +18,6 @@ public class GetAllUploadsUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
-  @Traced
   public Collection<Upload> execute(GetAllUploadsRequest request) {
     logger.info("Received request: {}", request);
     return dao.getAll(request).stream()
@@ -27,11 +25,11 @@ public class GetAllUploadsUseCase {
         .toList();
   }
 
-  public static GetAllUploadsUseCase getInitializedInstance(String correlationId) {
+  public static GetAllUploadsUseCase getInitializedInstance() {
     try {
       return getInstance(null, null);
     } catch (IllegalStateException cause) {
-      throw new SingletonNotInitializedError(cause, correlationId);
+      throw new SingletonNotInitializedError(cause);
     }
   }
 

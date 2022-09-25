@@ -6,6 +6,6 @@ public interface DeleteUploadByIdRequest
     extends de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.DeleteUploadByIdRequest {
 
   default void execute() {
-    DeleteUploadByIdUseCase.getInitializedInstance(getCorrelationId()).execute(this);
+    DeleteUploadByIdUseCase.getInitializedInstance().execute(this);
   }
 }

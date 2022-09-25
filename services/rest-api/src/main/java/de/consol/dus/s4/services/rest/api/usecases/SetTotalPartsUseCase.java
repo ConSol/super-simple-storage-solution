@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.microprofile.opentracing.Traced;
 import org.slf4j.Logger;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,7 +22,6 @@ public class SetTotalPartsUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
-  @Traced
   public Optional<Upload> execute(SetTotalPartsForUploadRequest request)
       throws TotalPartsAlreadySetException, TotalPartsSmallerThanMaxPartNumberException {
     logger.info("Received request: {}", request);
@@ -36,7 +34,7 @@ public class SetTotalPartsUseCase {
     throwIfTotalPartsAlreadySet(request, totalPartsFromRequest, fetched);
     throwIfTotalPartsTooSmall(request, totalPartsFromRequest, fetched);
     return dao.setNumPartsForUpload(request)
-        .map(new EnterProcessingRequest(request.getId(), request.getCorrelationId())::execute)
+        .map(new EnterProcessingRequest(request.getId())::execute)
         .map(Upload.class::cast);
   }
 
@@ -53,8 +51,7 @@ public class SetTotalPartsUseCase {
           totalPartsFromRequest);
       throw new TotalPartsAlreadySetException(
           upload.getId(),
-          upload.getTotalParts(),
-          request.getCorrelationId());
+          upload.getTotalParts());
     }
   }
 
@@ -78,16 +75,15 @@ public class SetTotalPartsUseCase {
       throw new TotalPartsSmallerThanMaxPartNumberException(
           request.getId(),
           totalPartsFromRequest,
-          maxPartNumber,
-          request.getCorrelationId());
+          maxPartNumber);
     }
   }
 
-  public static SetTotalPartsUseCase getInitializedInstance(String correlationId) {
+  public static SetTotalPartsUseCase getInitializedInstance() {
     try {
       return getInstance(null, null);
     } catch (IllegalStateException cause) {
-      throw new SingletonNotInitializedError(cause, correlationId);
+      throw new SingletonNotInitializedError(cause);
     }
   }
 

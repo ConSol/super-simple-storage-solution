@@ -22,13 +22,13 @@
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>2.9.2.Final</quarkus.platform.version>
+        <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+        <quarkus.platform.version>2.13.0.Final</quarkus.platform.version>
 
         <!-- Dependencies -->
         <archunit.version>0.23.1</archunit.version>
         <citrus.version>3.2.1</citrus.version>
-        <citrus-log4j.version>2.17.2</citrus-log4j.version>
+        <citrus-log4j.version>2.19.0</citrus-log4j.version>
         <citrus-spring-test.version>5.3.15</citrus-spring-test.version>
         <org.projectlombok.version>1.18.20</org.projectlombok.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
@@ -188,11 +188,6 @@
             <!-- S4 :: Commons -->
             <dependency>
                 <groupId>de.consol.dus</groupId>
-                <artifactId>s4-commons-correlation</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.consol.dus</groupId>
                 <artifactId>s4-commons-correlation-http</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -203,7 +198,17 @@
             </dependency>
             <dependency>
                 <groupId>de.consol.dus</groupId>
+                <artifactId>s4-commons-logger-injection</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>de.consol.dus</groupId>
                 <artifactId>s4-commons-micrometer-jvm-extras</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.consol.dus</groupId>
+                <artifactId>s4-commons-opentelemetry-amqp</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

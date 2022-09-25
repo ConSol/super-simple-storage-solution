@@ -1,47 +1,45 @@
 package de.consol.dus.s4.services.aggregator.boundary.messaging.amqp;
 
-import de.consol.dus.s4.commons.opentracing.messaging.amqp.TracedAmqpReceiver;
+import de.consol.dus.s4.commons.correlation.http.exceptions.filter.container.RequestFilter;
+import de.consol.dus.s4.commons.opentelemetry.messaging.amqp.TracedAmqpReceiver;
 import de.consol.dus.s4.services.aggregator.boundary.messaging.amqp.messages.UploadReadyForProcessing;
 import de.consol.dus.s4.services.aggregator.boundary.messaging.amqp.requests.AggreagateUploadDataRequestImpl;
-import io.opentracing.Tracer;
-import io.smallrye.reactive.messaging.amqp.IncomingAmqpMetadata;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.reactive.messaging.annotations.Blocking;
-import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import javax.enterprise.context.ApplicationScoped;
-import org.eclipse.microprofile.opentracing.Traced;
+import org.eclipse.microprofile.context.ManagedExecutor;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 
 @ApplicationScoped
 public class UploadReadyForProcessingReceiver extends TracedAmqpReceiver<UploadReadyForProcessing> {
 
   protected static final String SOURCE = "amqp-upload-ready-for-processing-incoming";
 
-  public UploadReadyForProcessingReceiver(Tracer tracer, Logger logger) {
-    super(tracer, logger);
+  public UploadReadyForProcessingReceiver(
+      Logger logger,
+      @SuppressWarnings("CdiInjectionPointsInspection") ManagedExecutor executor) {
+    super(logger, executor);
   }
 
   @Incoming(SOURCE)
   @Blocking
   protected CompletionStage<Void> receive(Message<UploadReadyForProcessing> message) {
-    return this.createSpanAndCallCallback(message);
+    return this.extractContextAndCallback(message);
   }
 
-  @Traced
+  @WithSpan
   @Override
   protected void callback(Message<UploadReadyForProcessing> message) {
+    Span.current().setAttribute(
+        RequestFilter.CORRELATION_ID_MDC_KEY,
+        MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     new AggreagateUploadDataRequestImpl(
-        message.getPayload().getId(),
-        message.getMetadata(IncomingAmqpMetadata.class)
-            .map(IncomingAmqpMetadata::getCorrelationId)
-            .orElse(UUID.randomUUID().toString()))
+        message.getPayload().getId())
         .execute();
-  }
-
-  @Override
-  protected String getSourceName() {
-    return SOURCE;
   }
 }

@@ -8,6 +8,6 @@ public interface GetAllUploadsRequest extends
     de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetAllUploadsRequest {
 
   default Collection<Upload> execute() {
-    return GetAllUploadsUseCase.getInitializedInstance(getCorrelationId()).execute(this);
+    return GetAllUploadsUseCase.getInitializedInstance().execute(this);
   }
 }

@@ -8,6 +8,6 @@ public interface GetUploadByIdRequest extends
     de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetUploadByIdRequest {
 
   default Optional<Upload> execute() {
-    return GetUploadByIdUseCase.getInitializedInstance(getCorrelationId()).execute(this);
+    return GetUploadByIdUseCase.getInitializedInstance().execute(this);
   }
 }
