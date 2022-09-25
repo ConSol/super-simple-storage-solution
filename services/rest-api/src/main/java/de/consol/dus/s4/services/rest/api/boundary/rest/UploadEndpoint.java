@@ -17,13 +17,18 @@ import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberAlre
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberIsBiggerThanTotalParts;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsAlreadySetException;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsSmallerThanMaxPartNumberException;
+import de.consol.dus.s4.services.rest.api.usecases.api.requests.DeleteUploadByIdRequest;
+import de.consol.dus.s4.services.rest.api.usecases.api.requests.GetAllUploadsRequest;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.UploadPart;
 import io.opentelemetry.api.trace.Span;
-import java.io.IOException;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
+import io.smallrye.mutiny.unchecked.Unchecked;
 import java.nio.file.Files;
-import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -57,19 +62,25 @@ public class UploadEndpoint {
   @APIResponse(ref = "uploadListOk")
   @APIResponse(ref = "ise")
   @GET
-  public Response getAllUploads(
+  public Uni<Response> getAllUploads(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       String correlationId) {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    final Collection<Upload> results = new GetAllUploadsRequestImpl(correlationId).execute();
-    return Response
-        .ok(results.stream()
-            .map(UploadResponse::new)
-            .toList())
-        .build();
+    // @formatter:off
+    return Uni.createFrom().item(new GetAllUploadsRequestImpl(correlationId))
+        .onItem()
+            .transform(GetAllUploadsRequest::execute)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transformToMulti(Multi.createFrom()::iterable)
+        .collect()
+            .asList()
+        .onItem()
+            .transform(items -> Response.ok(items).build());
+    // @formatter:on
   }
 
   @Operation(
@@ -81,7 +92,7 @@ public class UploadEndpoint {
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "ise")
   @POST
-  public Response startUpload(
+  public Uni<Response> startUpload(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       @Valid
@@ -94,11 +105,20 @@ public class UploadEndpoint {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    final Upload result =
-        new CreateNewUploadRequestImpl(request.getFileName(), correlationId).execute();
-    return Response
-        .ok(new UploadResponse(result))
-        .build();
+    // @formatter:off
+    return Uni
+        .createFrom()
+            .item(new CreateNewUploadRequestImpl(request.getFileName(), correlationId))
+        .onItem()
+            .transform(CreateNewUploadRequestImpl::execute)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(UploadResponse::new)
+        .onItem()
+            .transform(Response::ok)
+        .onItem()
+            .transform(Response.ResponseBuilder::build);
+    // @formatter:on
   }
 
   @Operation(
@@ -111,7 +131,7 @@ public class UploadEndpoint {
   @APIResponse(ref = "ise")
   @GET
   @Path("{id}")
-  public Response getUpload(
+  public Uni<Response> getUpload(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       @Valid
@@ -124,11 +144,54 @@ public class UploadEndpoint {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    final Upload result = new GetUploadByIdRequestImpl(id, correlationId).execute()
-        .orElseThrow(() -> new NoSuchEntityException(Upload.class, id));
-    return Response
-        .ok(new UploadResponse(result))
-        .build();
+    // @formatter:off
+    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id, correlationId))
+        .onItem()
+            .transform(this::executeAndHandleFailures)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(UploadResponse::new)
+        .onItem()
+            .transform(Response::ok)
+        .onItem()
+            .transform(Response.ResponseBuilder::build);
+    // @formatter:on
+  }
+
+  private Upload executeAndHandleFailures(GetUploadByIdRequestImpl request) {
+    return request.execute()
+        .orElseThrow(() -> new NoSuchEntityException(Upload.class, request.getId()));
+  }
+
+  private Upload executeAndHandleFailures(SetTotalPartsForUploadRequestImpl request) {
+    try {
+      return request.execute()
+          .orElseThrow(() -> new NoSuchEntityException(Upload.class, request.getId()));
+    } catch (TotalPartsSmallerThanMaxPartNumberException e) {
+      throw new ConflictException(
+          "largest part number is already %d".formatted(e.getMaxPartNumber()),
+          e);
+    } catch (TotalPartsAlreadySetException e) {
+      throw new ConflictException("totalParts already set", e);
+    }
+  }
+
+
+  private Upload executeAndHandleFailures(AddPartToUploadRequestImpl request) {
+    try {
+      return request.execute()
+          .orElseThrow(() -> new NoSuchEntityException(Upload.class, request.getId()));
+    } catch (PartNumberAlreadyExistsException e) {
+      throw new ConflictException(
+          "part with number %d already exists".formatted(request.getPartNumber()),
+          e);
+    } catch (PartNumberIsBiggerThanTotalParts e) {
+      throw new ConflictException(
+          "totalParts for Upload set to %d, thus a part with number %d cannot be added".formatted(
+              e.getTotalParts(),
+              e.getPartNumber()),
+          e);
+    }
   }
 
   @Operation(
@@ -141,7 +204,7 @@ public class UploadEndpoint {
   @APIResponse(ref = "ise")
   @DELETE
   @Path("{id}")
-  public Response deleteUpload(
+  public Uni<Response> deleteUpload(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       @Valid
@@ -154,8 +217,16 @@ public class UploadEndpoint {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    new DeleteUploadByIdRequestImpl(id, correlationId).execute();
-    return Response.noContent().build();
+    // @formatter:off
+    return Uni.createFrom().item(new DeleteUploadByIdRequestImpl(id, correlationId))
+        .onItem()
+            .invoke(DeleteUploadByIdRequest::execute)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(item -> Response.noContent())
+        .onItem()
+            .transform(Response.ResponseBuilder::build);
+    // @formatter:on
   }
 
   @Operation(
@@ -174,7 +245,7 @@ public class UploadEndpoint {
   @APIResponse(ref = "ise")
   @PUT
   @Path(value = "{id}/totalParts")
-  public Response addTotalParts(
+  public Uni<Response> addTotalParts(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       @Valid
@@ -193,21 +264,20 @@ public class UploadEndpoint {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    final Upload result;
-    try {
-      result = new SetTotalPartsForUploadRequestImpl(id, request.getTotalParts(), correlationId)
-          .execute()
-          .orElseThrow(() -> new NoSuchEntityException(Upload.class, id));
-    } catch (TotalPartsSmallerThanMaxPartNumberException cause) {
-      throw new ConflictException(
-          "largest part number is already %d".formatted(cause.getMaxPartNumber()),
-          cause);
-    } catch (TotalPartsAlreadySetException cause) {
-      throw new ConflictException("totalParts already set", cause);
-    }
-    return Response
-        .ok(new UploadResponse(result))
-        .build();
+    // @formatter:off
+    return Uni
+        .createFrom()
+            .item(new SetTotalPartsForUploadRequestImpl(id, request.getTotalParts(), correlationId))
+        .onItem()
+            .transform(this::executeAndHandleFailures)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(UploadResponse::new)
+        .onItem()
+            .transform(Response::ok)
+        .onItem()
+            .transform(Response.ResponseBuilder::build);
+    // @formatter:on
   }
 
   @Operation(
@@ -220,7 +290,7 @@ public class UploadEndpoint {
   @APIResponse(ref = "ise")
   @GET
   @Path(value = "{id}/parts")
-  public Response getParts(
+  public Uni<Response> getParts(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       @Valid
@@ -233,14 +303,24 @@ public class UploadEndpoint {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    return Response
-        .ok(new GetUploadByIdRequestImpl(id, correlationId).execute()
-            .map(Upload::getParts)
-            .orElseThrow(() -> new NoSuchEntityException(Upload.class, id))
-            .stream()
-            .map(UploadPart::getPartNumber)
-            .toList())
-        .build();
+    // @formatter:off
+    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id, correlationId))
+        .onItem()
+            .transform(this::executeAndHandleFailures)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(Upload::getParts)
+        .onItem()
+            .transformToMulti(Multi.createFrom()::iterable)
+        .onItem()
+          .transform(UploadPart::getPartNumber)
+        .collect()
+            .asList()
+        .onItem()
+            .transform(Response::ok)
+        .onItem()
+            .transform(Response.ResponseBuilder::build);
+    // @formatter:on
   }
 
   @Operation(
@@ -257,7 +337,7 @@ public class UploadEndpoint {
   @POST
   @Path(value = "{id}/parts")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
-  public Response addPart(
+  public Uni<Response> addPart(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       @Valid
@@ -272,35 +352,29 @@ public class UploadEndpoint {
       @MultipartForm
       @Valid
       @NotNull
-      AddPartToUploadRequest request)
-      throws IOException, NoSuchEntityException, ConflictException {
+      AddPartToUploadRequest request) {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    final Upload result;
-    try {
-      // @formatter:off
-      result = new AddPartToUploadRequestImpl(
-              id,
-              request.getPartNumber(),
-              Files.readAllBytes(request.getContent().filePath()),
-              correlationId)
-          .execute()
-          .orElseThrow(() -> new NoSuchEntityException(Upload.class, id));
-      // @formatter:on
-    } catch (PartNumberAlreadyExistsException cause) {
-      throw new ConflictException(
-          "part with number %d already exists".formatted(request.getPartNumber()),
-          cause
-      );
-    } catch (PartNumberIsBiggerThanTotalParts cause) {
-      throw new ConflictException(
-          "totalParts for Upload set to %d, thus a part with number %d cannot be added".formatted(
-              cause.getTotalParts(),
-              cause.getPartNumber()),
-          cause);
-    }
-    return Response.ok(new UploadResponse(result)).build();
+    // @formatter:off
+    return Uni.createFrom().voidItem()
+        .onItem()
+            .transform(Unchecked.function(nothing -> new AddPartToUploadRequestImpl(
+                id,
+                request.getPartNumber(),
+                Files.readAllBytes(request.getContent().filePath()),
+                correlationId)))
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(this::executeAndHandleFailures)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(UploadResponse::new)
+        .onItem()
+            .transform(Response::ok)
+        .onItem()
+            .transform(Response.ResponseBuilder::build);
+    // @formatter:on
   }
 
   @Operation(
@@ -320,7 +394,7 @@ public class UploadEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @Path(value = "{id}/parts/{partNumber}/content")
-  public Response getPartContent(
+  public Uni<Response> getPartContent(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       @Valid
@@ -338,22 +412,37 @@ public class UploadEndpoint {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    return Response
-        .ok(new GetUploadByIdRequestImpl(id, correlationId).execute()
-            .orElseThrow(() -> new NoSuchEntityException(Upload.class, id))
-            .getParts().stream()
-            .filter(part -> Objects.equals(part.getPartNumber(), partNumber))
-            .map(UploadPart::getContent)
-            .findFirst()
-            .orElseThrow(() -> new NoSuchEntityException(
-                "UploadPart with number %s does not exist".formatted(partNumber))))
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"%s.part_%010d\"".formatted(
-                new GetUploadByIdRequestImpl(id, correlationId).execute()
-                    .orElseThrow(() ->
-                        new NoSuchEntityException(Upload.class, id)).getFileName(), partNumber))
-        .build();
+    // @formatter:off
+    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id, correlationId))
+        .onItem()
+            .transform(this::executeAndHandleFailures)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(Upload::getParts)
+        .onItem()
+            .transformToMulti(Multi.createFrom()::iterable)
+        .select()
+            .where(part -> Objects.equals(part.getPartNumber(), partNumber))
+        .select()
+            .first()
+            .toUni()
+        .onItem().ifNull()
+            .failWith(new NoSuchEntityException(UploadPart.class, id))
+        .onItem()
+            .transform(UploadPart::getContent)
+        .onItem()
+            .transform(content -> Response
+                .ok(content)
+                .header(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"%s.part_%010d\"".formatted(
+                        new GetUploadByIdRequestImpl(id, correlationId)
+                            .execute()
+                            .orElseThrow(() -> new NoSuchEntityException(Upload.class, id))
+                            .getFileName(),
+                        partNumber))
+                .build());
+    // @formatter:on
   }
 
   @Operation(
@@ -371,7 +460,7 @@ public class UploadEndpoint {
   @GET
   @Produces({MediaType.APPLICATION_OCTET_STREAM})
   @Path("{id}/content")
-  public Response getUploadContent(
+  public Uni<Response> getUploadContent(
       @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
       @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
       @Valid
@@ -384,18 +473,21 @@ public class UploadEndpoint {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    final Upload result = new GetUploadByIdRequestImpl(id, correlationId).execute()
-        .orElseThrow(() -> new NoSuchEntityException(Upload.class, id));
-    final byte[] content = result.getContent();
-    if (Objects.nonNull(content)) {
-      return Response
-          .ok(content)
-          .type(MediaType.APPLICATION_OCTET_STREAM)
-          .header(
-              HttpHeaders.CONTENT_DISPOSITION,
-              "attachment; filename=\"%s\"".formatted(result.getFileName()))
-          .build();
-    }
-    return Response.noContent().build();
+    // @formatter:off
+    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id, correlationId))
+        .onItem()
+            .transform(this::executeAndHandleFailures)
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+        .onItem()
+            .transform(result -> Optional.of(result)
+                .map(Upload::getContent)
+                .map(content -> Response
+                    .ok(content)
+                    .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"%s\"".formatted(result.getFileName())))
+                .orElseGet(Response::noContent)
+                .build());
+    // @formatter:on
   }
 }

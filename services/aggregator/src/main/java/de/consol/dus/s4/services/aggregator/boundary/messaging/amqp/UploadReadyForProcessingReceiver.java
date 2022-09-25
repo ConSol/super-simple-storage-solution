@@ -35,8 +35,6 @@ public class UploadReadyForProcessingReceiver extends TracedAmqpReceiver<UploadR
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    new AggreagateUploadDataRequestImpl(
-        message.getPayload().getId())
-        .execute();
+    new AggreagateUploadDataRequestImpl(message.getPayload().getId()).execute();
   }
 }
