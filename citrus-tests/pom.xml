@@ -98,6 +98,11 @@
             <version>${citrus-log4j.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-layout-template-json</artifactId>
+            <version>${citrus-log4j.version}</version>
+        </dependency>
         <!-- Actual Citrus -->
         <dependency>
             <groupId>com.consol.citrus</groupId>

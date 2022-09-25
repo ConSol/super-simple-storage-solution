@@ -15,7 +15,9 @@ quarkus:
   log:
     console:
       format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X] (%t) %s%e%n'
-      json: ${CONSOLE_LOG_JSON:false}
+      json:
+        ~: ${CONSOLE_LOG_JSON:false}
+        exception-output-type: formatted
     handler:
       gelf:
         enabled: ${GELF_ENABLED:false}

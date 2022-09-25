@@ -125,13 +125,18 @@ services:
 
   # TESTS
   citrus-continuous:
+    container_name: citrus-continuous
     profiles:
       - tests
     build:
       context: ../citrus-tests/continuous
       dockerfile: ../../dockerfiles/Dockerfile.distroless
     env_file: citrus/continuous/.env
-    command:
+    entrypoint:
+      - "java"
+      - "-Dlog4j.configurationFile=classpath:log4j2-json.properties"
+      - "-jar"
+      - "app.jar"
       - "--engine"
       - "testng"
       - "--test"
@@ -145,6 +150,7 @@ services:
 
   # postgres + pgadmin4 web UI
   postgres:
+    container_name: postgres
     # 14.3
     image: postgres@sha256:5ea2da1f0275e38a6f39735b48a3688aae6ddfa2ad15971722d6fc0f2152918b
     volumes:
@@ -160,6 +166,7 @@ services:
       - default
       - database
   pgadmin4:
+    container_name: pgadmin4
     # 6.9
     image: dpage/pgadmin4@sha256:f0cfeddcbc9fb195b8447d345e5a4e5fe8f50faea5678c9ba32f923f1e0536e9
     volumes:
@@ -176,6 +183,7 @@ services:
 
   # apache activemq-artemis
   artemis:
+    container_name: artemis
     image: vromero/activemq-artemis:2.16.0-alpine@sha256:2621ab238411031e364cc219c621f20a6613efc3a91b43c85148e8872e6b3163
     volumes:
       - ${REMOTE_PROJECT_PATH:-.}/artemis/var/lib/artemis/etc-override:/var/lib/artemis/etc-override/:ro
@@ -189,6 +197,7 @@ services:
 
   # jaeger & otel collector
   jaeger:
+    container_name: jaeger
     # 1.35.1
     image: jaegertracing/all-in-one@sha256:f111f6ced1d3cc38eb102e278a87470644dba005c838f34ae92e375ab4bc21a4
     ports:
@@ -198,6 +207,7 @@ services:
     networks:
       - jaeger
   otel-collector:
+    container_name: otel-collector
     # 0.45.0
     image: otel/opentelemetry-collector@sha256:c4bbbdbd0194d5c9e361c3ed72b2e301dd23b886b98c1c1c9fb261bd60cb90d8
     command: [ "--config=/etc/otel-collector-config.yml" ]
@@ -215,6 +225,7 @@ services:
 
   # prometheus & grana
   prometheus:
+    container_name: prometheus
     # v2.36.0
     image: prom/prometheus@sha256:c833de2399020386dc1e886363467f60b7f8e404aef5eaa7a757d6968cf5147b
     volumes:
@@ -223,6 +234,7 @@ services:
       - default
       - monitoring
   grafana:
+    container_name: grafana
     # 8.5.4
     image: grafana/grafana@sha256:4efae4ef2855ec221836f65061be390fd9267ca63945b68a4e136ddcd430f005
     volumes:
@@ -240,6 +252,7 @@ services:
 
   # ELK-stack
   elasticsearch:
+    container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:${ELK_VERSION}
     ports:
       - "9200:9200"
@@ -250,6 +263,7 @@ services:
     networks:
       - logging
   logstash:
+    container_name: logstash
     image: docker.elastic.co/logstash/logstash-oss:${ELK_VERSION}
     volumes:
       - source: ${REMOTE_PROJECT_PATH:-.}/logstash/usr/share/logstash/pipeline
@@ -266,6 +280,7 @@ services:
     networks:
       - logging
   kibana:
+    container_name: kibana
     image: docker.elastic.co/kibana/kibana-oss:${ELK_VERSION}
     depends_on:
       - elasticsearch
@@ -274,6 +289,7 @@ services:
     networks:
       - logging
   filebeat:
+    container_name: filebeat
     image: docker.elastic.co/beats/filebeat-oss:${ELK_VERSION}
     user: root
     volumes:
@@ -293,7 +309,6 @@ services:
       - logging
     depends_on:
       - logstash
-
 
 networks:
   default:
