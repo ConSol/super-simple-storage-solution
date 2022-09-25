@@ -1,6 +1,6 @@
 # JRE 17:
-# Source: https://console.cloud.google.com/gcr/images/distroless/global/java17@sha256:e942c49fc2e6f7eacaf4ea6edf12f40f1a2c81454ba18c51df78c90b34df24b1/details?tab=vulnz
-FROM gcr.io/distroless/java17@sha256:e942c49fc2e6f7eacaf4ea6edf12f40f1a2c81454ba18c51df78c90b34df24b1
+# Source: https://console.cloud.google.com/gcr/images/distroless/global/java17@sha256:d8e3ff1283abe92f7aa12ed4d8156d0ef04bf44e7d7c54a48c821444587fbc97
+FROM gcr.io/distroless/java17@sha256:d8e3ff1283abe92f7aa12ed4d8156d0ef04bf44e7d7c54a48c821444587fbc97
 
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en"
 

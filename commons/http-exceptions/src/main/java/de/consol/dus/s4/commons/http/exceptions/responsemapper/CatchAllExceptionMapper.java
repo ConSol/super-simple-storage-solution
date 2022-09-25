@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 
 @Provider
 public class CatchAllExceptionMapper implements ExceptionMapper<RuntimeException> {
+  @SuppressWarnings("CdiInjectionPointsInspection")
   @Inject
   Logger logger;
 
