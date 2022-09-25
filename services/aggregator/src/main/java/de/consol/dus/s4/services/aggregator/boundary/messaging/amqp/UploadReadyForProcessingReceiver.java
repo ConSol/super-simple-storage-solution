@@ -17,16 +17,13 @@ import org.slf4j.MDC;
 
 @ApplicationScoped
 public class UploadReadyForProcessingReceiver extends TracedAmqpReceiver<UploadReadyForProcessing> {
-
-  protected static final String SOURCE = "amqp-upload-ready-for-processing-incoming";
-
   public UploadReadyForProcessingReceiver(
       Logger logger,
       @SuppressWarnings("CdiInjectionPointsInspection") ManagedExecutor executor) {
     super(logger, executor);
   }
 
-  @Incoming(SOURCE)
+  @Incoming("amqp-upload-ready-for-processing-incoming")
   @Blocking
   protected CompletionStage<Void> receive(Message<UploadReadyForProcessing> message) {
     return this.extractContextAndCallback(message);

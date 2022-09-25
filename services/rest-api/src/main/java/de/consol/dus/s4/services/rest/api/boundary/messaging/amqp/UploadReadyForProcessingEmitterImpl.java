@@ -16,10 +16,10 @@ import org.slf4j.Logger;
 @ApplicationScoped
 public class UploadReadyForProcessingEmitterImpl extends TracedAmqpEmitter<UploadReadyForProcessing>
     implements UploadReadyForProcessingEmitter {
-  public static final String DESTINATION = "amqp-upload-ready-for-processing-outgoing";
-
   public UploadReadyForProcessingEmitterImpl(
-      @Channel(DESTINATION) Emitter<UploadReadyForProcessing> emitter,
+      @Channel("amqp-upload-ready-for-processing-outgoing")
+      Emitter<UploadReadyForProcessing> emitter,
+
       Logger logger) {
     super(emitter, logger);
   }
