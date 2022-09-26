@@ -3,7 +3,6 @@ package de.consol.dus.s4.services.rest.api.usecases;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.SingletonNotInitializedError;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.UploadStatus;
-import de.consol.dus.s4.services.rest.api.usecases.internal.api.EnterProcessingRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetStatusOfUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.messaging.UploadReadyForProcessingEmitter;
@@ -23,78 +22,69 @@ public class EnterProcessingStageUseCase {
   private final Logger logger;
   private final UploadReadyForProcessingEmitter emitter;
 
-  public void execute(EnterProcessingRequest request) {
+  public void execute(long id) {
     try {
-      logger.info("Received request: {}", request);
-      final long id = request.getId();
-      if (updateCanBeProcessed(request)) {
-        logger.debug("Request: {}: Upload with id {} is ready for processing", request, id);
-        setStatusToProcessing(request);
+      logger.info("Received request to check if Upload with id {} can be processed", id);
+      if (updateCanBeProcessed(id)) {
+        logger.debug("Upload with id {} is ready for processing", id);
+        setStatusToProcessing(id);
         emitter.emit(new SendUploadReadyForProcessingRequest(id));
       }
     } catch (Exception e) {
-      logger.error("Request {}: error occurred", request, e);
+      logger.error("Exception occurred", e);
     }
   }
 
-  private boolean updateCanBeProcessed(EnterProcessingRequest request) {
-    final long id = request.getId();
-    final Optional<? extends Upload> maybeUpload = dao.getById(request);
+  private boolean updateCanBeProcessed(long id) {
+    final Optional<? extends Upload> maybeUpload = dao.getById(id);
     if (maybeUpload.isEmpty()) {
-      logger.debug("Request: {}: Upload with id {} odes not exist", request, id);
+      logger.debug("Upload with id {} odes not exist", id);
       return false;
     }
     final Upload upload = maybeUpload.get();
-    if (isAlreadyInProcessingState(upload, request)) {
+    if (isAlreadyInProcessingState(upload)) {
       return false;
     }
-    if (isAlreadyDone(upload, request)) {
+    if (isAlreadyDone(upload)) {
       return false;
     }
-    if (hasNoTotalSize(upload, request)) {
+    if (hasNoTotalSize(upload)) {
       return false;
     }
-    return allPartsReceived(upload, request);
+    return allPartsReceived(upload);
   }
 
-  private boolean isAlreadyInProcessingState(Upload upload, EnterProcessingRequest request) {
+  private boolean isAlreadyInProcessingState(Upload upload) {
     if (Objects.equals(upload.getStatus(), UploadStatus.PROCESSING)) {
-      logger.debug(
-          "Request: {}: Upload with id {} is already in processing state",
-          request,
-          request.getId());
+      logger.debug("Upload with id {} is already in processing state", upload.getId());
       return true;
     }
     return false;
   }
 
-  private boolean isAlreadyDone(Upload upload, EnterProcessingRequest request) {
+  private boolean isAlreadyDone(Upload upload) {
     if (Objects.equals(upload.getStatus(), UploadStatus.DONE)) {
-      logger.debug("Request: {}: Upload with id {} is already done", request, request.getId());
+      logger.debug("Upload with id {} is already done", upload.getId());
       return true;
     }
     return false;
   }
 
-  private boolean hasNoTotalSize(Upload upload, EnterProcessingRequest request) {
+  private boolean hasNoTotalSize(Upload upload) {
     if (Objects.isNull(upload.getTotalParts())) {
-      logger.debug(
-          "Request: {}: Upload with id {} has totalParts not yet set",
-          request,
-          request.getId());
+      logger.debug("Upload with id {} has totalParts not yet set", upload.getId());
       return true;
     }
     return false;
   }
 
-  private boolean allPartsReceived(Upload upload, EnterProcessingRequest request) {
+  private boolean allPartsReceived(Upload upload) {
     final int receivedParts = upload.getParts().size();
     final int totalParts = upload.getTotalParts();
     if (receivedParts != totalParts) {
       logger.debug(
-          "Request: {}: Upload with id {} has totalParts set to {}, but only {} received until now",
-          request,
-          request.getId(),
+          "Upload with id {} has totalParts set to {}, but only {} received until now",
+          upload.getId(),
           totalParts,
           receivedParts);
       return false;
@@ -102,10 +92,8 @@ public class EnterProcessingStageUseCase {
     return true;
   }
 
-  private void setStatusToProcessing(EnterProcessingRequest request) {
-    dao.setStatusOfUpload(new SetStatusOfUploadRequest(
-        request.getId(),
-        UploadStatus.PROCESSING));
+  private void setStatusToProcessing(long id) {
+    dao.setStatusOfUpload(new SetStatusOfUploadRequest(id, UploadStatus.PROCESSING));
   }
 
   public static EnterProcessingStageUseCase getInitializedInstance() {

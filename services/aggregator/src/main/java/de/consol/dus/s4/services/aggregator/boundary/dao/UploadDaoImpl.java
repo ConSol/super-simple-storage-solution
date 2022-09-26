@@ -3,7 +3,6 @@ package de.consol.dus.s4.services.aggregator.boundary.dao;
 import de.consol.dus.s4.services.aggregator.boundary.dao.entity.UploadEntity;
 import de.consol.dus.s4.services.aggregator.boundary.dao.integration.usecases.responses.UploadImpl;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.UploadDao;
-import de.consol.dus.s4.services.aggregator.usecases.spi.dao.requests.GetUploadByIdRequest;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.requests.WriteContentAndReleasePartsRequest;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.Upload;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.UploadStatus;
@@ -21,8 +20,8 @@ public class UploadDaoImpl implements UploadDao {
 
   @Transactional
   @Override
-  public Optional<Upload> getById(GetUploadByIdRequest request) {
-    return repository.findById(request.getId()).map(UploadImpl::new);
+  public Optional<Upload> getById(long id) {
+    return repository.findById(id).map(UploadImpl::new);
   }
 
   @Transactional
@@ -31,7 +30,7 @@ public class UploadDaoImpl implements UploadDao {
       WriteContentAndReleasePartsRequest request) {
     final Optional<UploadEntity> maybeUpload = repository.findById(request.getId());
     if (maybeUpload.isEmpty()) {
-      logger.info("Request {}: Upload with id {} does not exist", request, request.getId());
+      logger.info("Upload with id {} does not exist", request.getId());
       return;
     }
     final UploadEntity upload = maybeUpload.get().setContent(request.getContent());

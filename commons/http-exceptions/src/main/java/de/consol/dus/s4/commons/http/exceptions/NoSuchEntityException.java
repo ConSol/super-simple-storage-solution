@@ -9,8 +9,4 @@ public class NoSuchEntityException extends HttpStatusException {
         Response.Status.NOT_FOUND
     );
   }
-
-  public NoSuchEntityException(String message) {
-    super(message, Response.Status.NOT_FOUND);
-  }
 }

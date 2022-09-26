@@ -1,7 +1,6 @@
 package de.consol.dus.s4.services.rest.api.usecases;
 
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.SingletonNotInitializedError;
-import de.consol.dus.s4.services.rest.api.usecases.api.requests.GetUploadByIdRequest;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
 import java.util.Objects;
@@ -18,9 +17,9 @@ public class GetUploadByIdUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
-  public Optional<Upload> execute(GetUploadByIdRequest request) {
-    logger.info("Received request: {}", request);
-    return dao.getById(request).map(Upload.class::cast);
+  public Optional<Upload> execute(long id) {
+    logger.info("Received request to get upload with id{}", id);
+    return dao.getById(id).map(Upload.class::cast);
   }
 
   public static GetUploadByIdUseCase getInitializedInstance() {

@@ -2,6 +2,7 @@ package de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public interface Upload {
   long getId();
 

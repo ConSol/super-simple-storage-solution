@@ -1,7 +1,6 @@
 package de.consol.dus.s4.services.rest.api.usecases;
 
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.SingletonNotInitializedError;
-import de.consol.dus.s4.services.rest.api.usecases.api.requests.DeleteUploadByIdRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -15,9 +14,9 @@ public class DeleteUploadByIdUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
-  public void execute(DeleteUploadByIdRequest request) {
-    logger.info("Received request: {}", request);
-    dao.deleteById(request);
+  public void execute(long id) {
+    logger.info("Received request to delete upload with id {}", id);
+    dao.deleteById(id);
   }
 
   public static DeleteUploadByIdUseCase getInitializedInstance() {

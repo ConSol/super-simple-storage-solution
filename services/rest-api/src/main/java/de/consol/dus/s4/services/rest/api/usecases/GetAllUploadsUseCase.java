@@ -3,7 +3,6 @@ package de.consol.dus.s4.services.rest.api.usecases;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.SingletonNotInitializedError;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
-import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetAllUploadsRequest;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,9 +17,9 @@ public class GetAllUploadsUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
-  public Collection<Upload> execute(GetAllUploadsRequest request) {
-    logger.info("Received request: {}", request);
-    return dao.getAll(request).stream()
+  public Collection<Upload> execute() {
+    logger.info("Received request to get all uploads");
+    return dao.getAll().stream()
         .map(Upload.class::cast)
         .toList();
   }

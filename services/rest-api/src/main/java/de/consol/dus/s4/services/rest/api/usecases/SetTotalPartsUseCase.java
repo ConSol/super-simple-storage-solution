@@ -26,26 +26,23 @@ public class SetTotalPartsUseCase {
       throws TotalPartsAlreadySetException, TotalPartsSmallerThanMaxPartNumberException {
     logger.info("Received request: {}", request);
     final int totalPartsFromRequest = request.getTotalParts();
-    final Optional<? extends Upload> maybeUpload = dao.getById(request);
+    final Optional<? extends Upload> maybeUpload = dao.getById(request.getId());
     if (maybeUpload.isEmpty()) {
       return Optional.empty();
     }
     final Upload fetched = maybeUpload.get();
-    throwIfTotalPartsAlreadySet(request, totalPartsFromRequest, fetched);
+    throwIfTotalPartsAlreadySet(totalPartsFromRequest, fetched);
     throwIfTotalPartsTooSmall(request, totalPartsFromRequest, fetched);
-    return dao.setNumPartsForUpload(request)
+    return dao.setTotalPartsForUpload(request)
         .map(new EnterProcessingRequest(request.getId())::execute)
         .map(Upload.class::cast);
   }
 
-  private void throwIfTotalPartsAlreadySet(
-      SetTotalPartsForUploadRequest request,
-      int totalPartsFromRequest,
-      Upload upload) throws TotalPartsAlreadySetException {
+  private void throwIfTotalPartsAlreadySet(int totalPartsFromRequest, Upload upload)
+      throws TotalPartsAlreadySetException {
     if (Objects.nonNull(upload.getTotalParts())) {
       logger.info(
-          "Request {}: totalParts for Upload with id {} already set (requested: {}, actual: {})",
-          request,
+          "totalParts for Upload with id {} already set (requested: {}, actual: {})",
           upload.getId(),
           upload.getTotalParts(),
           totalPartsFromRequest);
@@ -66,9 +63,8 @@ public class SetTotalPartsUseCase {
         .orElse(0);
     if (totalPartsFromRequest < maxPartNumber) {
       logger.info(
-          "Request {}: upload with id {} already has a part with partNumber {}, hence totalParts "
-              + "cannot be set to {}",
-          request,
+          "Upload with id {} already has a part with partNumber {}, hence totalParts cannot be set "
+              + "to {}",
           request.getId(),
           maxPartNumber,
           request.getTotalParts());

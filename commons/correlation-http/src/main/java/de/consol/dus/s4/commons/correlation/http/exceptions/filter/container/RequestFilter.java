@@ -12,6 +12,7 @@ public class RequestFilter {
   public static final String CORRELATION_ID_HEADER_KEY = "X-Correlation-ID";
   public static final String CORRELATION_ID_MDC_KEY = "correlationId";
 
+  @SuppressWarnings("unused")
   @RouteFilter(RouteFilter.DEFAULT_PRIORITY + 1)
   void addCorrelationIdFilter(RoutingContext context) {
     final String correlationId = getOrCreateCorrelationIdFromRequest(context);

@@ -6,22 +6,25 @@ import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.UploadPar
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.UploadStatus;
 import java.util.List;
 import java.util.Optional;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
 public final class UploadImpl implements Upload {
+  @Getter(AccessLevel.PRIVATE)
   private final UploadEntity delegate;
 
   public long getId() {
-    return this.delegate.getId();
+    return getDelegate().getId();
   }
 
   public String getFileName() {
-    return this.delegate.getFileName();
+    return getDelegate().getFileName();
   }
 
   public List<UploadPart> getParts() {
-    return Optional.of(this.delegate)
+    return Optional.of(getDelegate())
         .map(UploadEntity::getParts)
         .stream()
         .flatMap(List::stream)
@@ -31,14 +34,14 @@ public final class UploadImpl implements Upload {
   }
 
   public UploadStatus getStatus() {
-    return this.delegate.getStatus();
+    return getDelegate().getStatus();
   }
 
   public Integer getTotalParts() {
-    return this.delegate.getTotalParts();
+    return getDelegate().getTotalParts();
   }
 
   public byte[] getContent() {
-    return this.delegate.getContent();
+    return getDelegate().getContent();
   }
 }

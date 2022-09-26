@@ -22,6 +22,7 @@ import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetStatusOfU
 import de.consol.dus.s4.services.rest.api.usecases.spi.messaging.requests.SendUploadReadyForProcessingRequest;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+@SuppressWarnings("unused")
 @RegisterForReflection(targets = {
     UploadImpl.class,
     UploadPartImpl.class,

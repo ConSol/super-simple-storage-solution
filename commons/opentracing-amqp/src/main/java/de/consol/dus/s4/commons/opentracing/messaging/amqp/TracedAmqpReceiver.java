@@ -65,9 +65,7 @@ public abstract class TracedAmqpReceiver<T> extends TracedReceiver implements Tr
           .orElse("<UNKNOWN>");
       return buildAndStartReceiveSpan(context, destination);
     }
-    logger.warn(
-        "Request {}: Unable to extract uber-trace-id, starting new, uncorrelated span",
-        received.getPayload());
+    logger.warn("Unable to extract uber-trace-id, starting new, uncorrelated span");
     return getTracer().activeSpan();
   }
 }

@@ -23,7 +23,7 @@ public final class AddPartToUploadUseCase {
 
   public Optional<Upload> execute(AddPartToUploadRequest request)
       throws PartNumberAlreadyExistsException, PartNumberIsBiggerThanTotalParts {
-    logger.info("Received request: {}", request);
+    logger.info("Received request");
     return dao.addPartToUpload(request)
         .map(new EnterProcessingRequest(request.getId())::execute)
         .map(Upload.class::cast);

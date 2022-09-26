@@ -4,9 +4,6 @@ import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberAlre
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberIsBiggerThanTotalParts;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.AddPartToUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.CreateNewUploadRequest;
-import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.DeleteUploadByIdRequest;
-import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetAllUploadsRequest;
-import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetUploadByIdRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetStatusOfUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetTotalPartsForUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.responses.Upload;
@@ -16,16 +13,16 @@ import java.util.Optional;
 public interface UploadDao {
   Upload createNewUpload(CreateNewUploadRequest request);
 
-  Optional<Upload> getById(GetUploadByIdRequest request);
+  Optional<Upload> getById(long id);
 
-  void deleteById(DeleteUploadByIdRequest request);
+  void deleteById(long id);
 
   Optional<Upload> addPartToUpload(AddPartToUploadRequest request)
       throws PartNumberAlreadyExistsException, PartNumberIsBiggerThanTotalParts;
 
-  Collection<Upload> getAll(GetAllUploadsRequest request);
+  Collection<Upload> getAll();
 
-  Optional<Upload> setNumPartsForUpload(SetTotalPartsForUploadRequest request);
+  Optional<Upload> setTotalPartsForUpload(SetTotalPartsForUploadRequest request);
 
   void setStatusOfUpload(SetStatusOfUploadRequest request);
 }

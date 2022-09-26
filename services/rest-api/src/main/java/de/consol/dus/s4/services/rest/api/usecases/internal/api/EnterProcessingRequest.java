@@ -1,12 +1,11 @@
 package de.consol.dus.s4.services.rest.api.usecases.internal.api;
 
 import de.consol.dus.s4.services.rest.api.usecases.EnterProcessingStageUseCase;
-import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetUploadByIdRequest;
 import io.smallrye.mutiny.Uni;
 import lombok.Value;
 
 @Value
-public class EnterProcessingRequest implements GetUploadByIdRequest {
+public class EnterProcessingRequest {
   long id;
 
   public <T> T execute(T t) {
@@ -18,9 +17,7 @@ public class EnterProcessingRequest implements GetUploadByIdRequest {
     Uni.createFrom()
         .item(EnterProcessingStageUseCase.getInitializedInstance())
         .onItem()
-            .invoke(useCase -> useCase.execute(this))
+            .invoke(useCase -> useCase.execute(getId()))
         .subscribe().asCompletionStage();
   }
-
-
 }

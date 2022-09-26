@@ -7,15 +7,15 @@ import lombok.Getter;
 import lombok.Value;
 import lombok.experimental.Delegate;
 
+@SuppressWarnings("unused")
 @Value
 @JsonIgnoreProperties({"delegate", "content", "parts"})
 public class UploadResponse implements Upload {
-  @Getter(AccessLevel.NONE)
+  @Getter(AccessLevel.PRIVATE)
   @Delegate
   Upload delegate;
 
   public int getPartsReceived() {
-    return delegate.getParts().size();
+    return getDelegate().getParts().size();
   }
-
 }

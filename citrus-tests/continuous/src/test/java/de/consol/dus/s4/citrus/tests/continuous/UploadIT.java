@@ -18,6 +18,8 @@ import de.consol.dus.s4.citrus.tests.client.request.WaitForUploadDoneRequest;
 import de.consol.dus.s4.citrus.tests.client.response.UploadResponse;
 import de.consol.dus.s4.citrus.tests.continuous.configuration.tests.TestConfig;
 import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.testng.annotations.Optional;
@@ -25,6 +27,8 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 public class UploadIT extends TestNGCitrusSpringSupport {
+  private static final Logger LOGGER = LogManager.getLogger(UploadIT.class);
+
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private TestConfig config;
@@ -95,7 +99,7 @@ public class UploadIT extends TestNGCitrusSpringSupport {
               correlationId)));
         }
       } catch (Exception e) {
-        runner.$(echo("Caught error: %s".formatted(e)));
+        LOGGER.error("Error", e);
       } finally {
         runner.$(sleep().milliseconds(config.getSleepBetweenUploadsInMs()));
       }

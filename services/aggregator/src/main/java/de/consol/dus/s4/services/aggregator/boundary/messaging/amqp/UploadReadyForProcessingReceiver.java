@@ -3,7 +3,7 @@ package de.consol.dus.s4.services.aggregator.boundary.messaging.amqp;
 import de.consol.dus.s4.commons.correlation.http.exceptions.filter.container.RequestFilter;
 import de.consol.dus.s4.commons.opentelemetry.messaging.amqp.TracedAmqpReceiver;
 import de.consol.dus.s4.services.aggregator.boundary.messaging.amqp.messages.UploadReadyForProcessing;
-import de.consol.dus.s4.services.aggregator.boundary.messaging.amqp.requests.AggreagateUploadDataRequestImpl;
+import de.consol.dus.s4.services.aggregator.boundary.messaging.amqp.requests.AggregateUploadDataRequestImpl;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.reactive.messaging.annotations.Blocking;
@@ -26,7 +26,7 @@ public class UploadReadyForProcessingReceiver extends TracedAmqpReceiver<UploadR
   @Incoming("amqp-upload-ready-for-processing-incoming")
   @Blocking
   protected CompletionStage<Void> receive(Message<UploadReadyForProcessing> message) {
-    return this.extractContextAndCallback(message);
+    return extractContextAndCallback(message);
   }
 
   @WithSpan
@@ -35,6 +35,6 @@ public class UploadReadyForProcessingReceiver extends TracedAmqpReceiver<UploadR
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
-    new AggreagateUploadDataRequestImpl(message.getPayload().getId()).execute();
+    new AggregateUploadDataRequestImpl(message.getPayload().getId()).execute();
   }
 }

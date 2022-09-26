@@ -1,10 +1,11 @@
 package de.consol.dus.s4.services.aggregator.usecases.api.requests;
 
 import de.consol.dus.s4.services.aggregator.usecases.AggregateUploadDataUseCase;
-import de.consol.dus.s4.services.aggregator.usecases.spi.dao.requests.GetUploadByIdRequest;
 
-public interface AggregateUploadDataRequest extends GetUploadByIdRequest {
+public interface AggregateUploadDataRequest {
+  long getId();
+
   default void execute() {
-    AggregateUploadDataUseCase.getInitializedInstance().execute(this);
+    AggregateUploadDataUseCase.getInitializedInstance().execute(getId());
   }
 }

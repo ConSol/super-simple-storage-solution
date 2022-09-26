@@ -8,9 +8,6 @@ import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberIsBi
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.AddPartToUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.CreateNewUploadRequest;
-import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.DeleteUploadByIdRequest;
-import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetAllUploadsRequest;
-import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.GetUploadByIdRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetStatusOfUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetTotalPartsForUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.responses.Upload;
@@ -37,15 +34,15 @@ public class UploadDaoImpl implements UploadDao {
 
   @Transactional
   @Override
-  public Optional<Upload> getById(GetUploadByIdRequest request) {
-    return repository.findById(request.getId()).map(UploadImpl::new);
+  public Optional<Upload> getById(long id) {
+    return repository.findById(id).map(UploadImpl::new);
   }
 
   @Transactional
   @Override
-  public void deleteById(DeleteUploadByIdRequest request) {
+  public void deleteById(long id) {
     try {
-      repository.deleteById(request.getId());
+      repository.deleteById(id);
     } catch (Exception e) {
       // Suppress exceptions, they get logged anyway through the transaction
     }
@@ -104,7 +101,7 @@ public class UploadDaoImpl implements UploadDao {
 
   @Transactional
   @Override
-  public Collection<Upload> getAll(GetAllUploadsRequest request) {
+  public Collection<Upload> getAll() {
     return repository.findAll().stream()
         .map(UploadImpl::new)
         .map(Upload.class::cast)
@@ -113,7 +110,7 @@ public class UploadDaoImpl implements UploadDao {
 
   @Transactional
   @Override
-  public Optional<Upload> setNumPartsForUpload(SetTotalPartsForUploadRequest request) {
+  public Optional<Upload> setTotalPartsForUpload(SetTotalPartsForUploadRequest request) {
     return repository.findById(request.getId())
         .map(upload -> upload.setTotalParts(request.getTotalParts()))
         .map(UploadImpl::new);

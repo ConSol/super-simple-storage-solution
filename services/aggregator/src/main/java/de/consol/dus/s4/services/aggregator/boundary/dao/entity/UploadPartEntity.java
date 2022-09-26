@@ -62,10 +62,13 @@ public class UploadPartEntity {
     if (this == o) {
       return true;
     }
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+    if (o == null) {
       return false;
     }
-    UploadPartEntity that = (UploadPartEntity) o;
+    if (Hibernate.getClass(this) != Hibernate.getClass(o) && getClass() != o.getClass()) {
+      return false;
+    }
+    final UploadPartEntity that = (UploadPartEntity) o;
     return id != null && Objects.equals(id, that.id);
   }
 

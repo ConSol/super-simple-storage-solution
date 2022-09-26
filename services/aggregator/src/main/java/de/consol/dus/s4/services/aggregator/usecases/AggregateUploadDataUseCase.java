@@ -1,7 +1,6 @@
 package de.consol.dus.s4.services.aggregator.usecases;
 
 import de.consol.dus.s4.services.aggregator.usecases.api.exceptions.SingletonNotInitializedError;
-import de.consol.dus.s4.services.aggregator.usecases.api.requests.AggregateUploadDataRequest;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.UploadDao;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.requests.WriteContentAndReleasePartsRequest;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.Upload;
@@ -24,18 +23,18 @@ public class AggregateUploadDataUseCase {
   private final UploadDao dao;
   private final Logger logger;
 
-  public void execute(AggregateUploadDataRequest request) {
-    logger.info("Received request: {}", request);
-    final Optional<Upload> maybeUpload = dao.getById(request);
+  public void execute(long id) {
+    logger.info("Received request to aggregate parts of Upload with id {}", id);
+    final Optional<Upload> maybeUpload = dao.getById(id);
     if (maybeUpload.isEmpty()) {
-      logger.info("Request {}: Upload with id {} does not exist", request, request.getId());
+      logger.info("Upload with id {} does not exist", id);
       return;
     }
     final Upload upload = maybeUpload.get();
-    if (isUploadReadyToBeProcessed(upload, request)) {
+    if (isUploadReadyToBeProcessed(upload)) {
       final byte[] content = aggregateContent(upload);
       dao.writeContentAndDeletePartsAndSetStatusToDone(new WriteContentAndReleasePartsRequest(
-          request.getId(),
+          id,
           content));
     }
   }
@@ -59,54 +58,50 @@ public class AggregateUploadDataUseCase {
     return content;
   }
 
-  private boolean isUploadReadyToBeProcessed(Upload upload, AggregateUploadDataRequest request) {
-    if (isStillInProgress(upload, request)) {
+  private boolean isUploadReadyToBeProcessed(Upload upload) {
+    if (isStillInProgress(upload)) {
       return false;
     }
-    if (isAlreadyDone(upload, request)) {
+    if (isAlreadyDone(upload)) {
       return false;
     }
-    if (hasNoTotalSize(upload, request)) {
+    if (hasNoTotalSize(upload)) {
       return false;
     }
-    return allPartsReceived(upload, request);
+    return allPartsReceived(upload);
   }
 
-  private boolean isStillInProgress(Upload upload, AggregateUploadDataRequest request) {
+  private boolean isStillInProgress(Upload upload) {
     if (Objects.equals(upload.getStatus(), UploadStatus.UPLOAD_IN_PROGRESS)) {
-      logger.debug("Request: {}: Upload with id {} is still in progress", request, request.getId());
+      logger.debug("Upload with id {} is still in progress", upload.getId());
       return true;
     }
     return false;
   }
 
-  private boolean isAlreadyDone(Upload upload, AggregateUploadDataRequest request) {
+  private boolean isAlreadyDone(Upload upload) {
     if (Objects.equals(upload.getStatus(), UploadStatus.DONE)) {
-      logger.debug("Request: {}: Upload with id {} is already done", request, request.getId());
+      logger.debug("Upload with id {} is already done", upload.getId());
       return true;
     }
     return false;
   }
 
-  private boolean hasNoTotalSize(Upload upload, AggregateUploadDataRequest request) {
+  private boolean hasNoTotalSize(Upload upload) {
     if (Objects.isNull(upload.getTotalParts())) {
-      logger.debug(
-          "Request: {}: Upload with id {} has totalParts not yet set",
-          request,
-          request.getId());
+      logger.debug("Upload with id {} has totalParts not yet set", upload.getId());
       return true;
     }
     return false;
   }
 
-  private boolean allPartsReceived(Upload upload, AggregateUploadDataRequest request) {
+  private boolean allPartsReceived(Upload upload) {
     final int receivedParts = upload.getParts().size();
     final int totalParts = upload.getTotalParts();
     if (receivedParts != totalParts) {
       logger.debug(
-          "Request: {}: Upload with id {} has totalParts set to {}, but only {} received until now",
-          request,
-          request.getId(),
+          "Upload with id {} has totalParts set to {}, but only {} received until now",
+          upload.getId(),
           totalParts,
           receivedParts);
       return false;

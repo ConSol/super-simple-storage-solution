@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+@SuppressWarnings("SpringFacetCodeInspection")
 @Getter
 @Configuration
 @ComponentScan("de.consol.dus.s4.citrus.tests")

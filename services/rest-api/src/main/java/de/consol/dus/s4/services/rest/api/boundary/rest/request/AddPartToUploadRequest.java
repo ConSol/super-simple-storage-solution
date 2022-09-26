@@ -12,6 +12,7 @@ import org.jboss.resteasy.reactive.PartType;
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
+@SuppressWarnings("unused")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,21 +21,19 @@ public class AddPartToUploadRequest {
   @PartType(MediaType.TEXT_PLAIN)
   @NotNull
   @Min(value = 1)
-  Integer partNumber;
+  private Integer partNumber;
 
   @RestForm("content")
   @PartType(MediaType.APPLICATION_OCTET_STREAM)
   @Schema(type = SchemaType.STRING, format = "binary")
   @NotNull
-  FileUpload content;
+  private FileUpload content;
 
   // These two setters are necessary so that quarkus can initialize the multipart fields
-  @SuppressWarnings("unused")
   public void setPartNumber(Integer partNumber) {
     this.partNumber = partNumber;
   }
 
-  @SuppressWarnings("unused")
   public void setContent(FileUpload content) {
     this.content = content;
   }

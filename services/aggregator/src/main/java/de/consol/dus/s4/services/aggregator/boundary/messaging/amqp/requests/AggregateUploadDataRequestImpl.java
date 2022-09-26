@@ -4,6 +4,6 @@ import de.consol.dus.s4.services.aggregator.usecases.api.requests.AggregateUploa
 import lombok.Value;
 
 @Value
-public class AggreagateUploadDataRequestImpl implements AggregateUploadDataRequest {
+public class AggregateUploadDataRequestImpl implements AggregateUploadDataRequest {
   long id;
 }

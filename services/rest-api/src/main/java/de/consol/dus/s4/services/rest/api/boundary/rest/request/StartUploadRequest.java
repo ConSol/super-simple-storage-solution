@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+@SuppressWarnings("unused")
 @Value
 @Jacksonized
 @Builder(access = AccessLevel.PACKAGE)
