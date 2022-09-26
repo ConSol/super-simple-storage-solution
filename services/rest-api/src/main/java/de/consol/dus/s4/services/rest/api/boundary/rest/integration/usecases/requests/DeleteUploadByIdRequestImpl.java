@@ -5,8 +5,7 @@ import lombok.ToString;
 import lombok.Value;
 
 @Value
-@ToString(exclude = "correlationId")
+@ToString
 public class DeleteUploadByIdRequestImpl implements DeleteUploadByIdRequest {
   long id;
-  String correlationId;
 }

@@ -39,15 +39,15 @@ public class UploadIT extends TestNGCitrusSpringSupport {
   public void keepUploading(
       @Optional @CitrusResource TestCaseRunner runner,
       @Optional @CitrusResource TestContext context) {
-    String fileName = "PenPen-%s.png".formatted(UUID.randomUUID());
     while (true) {
+      final String fileName = "PenPen-%s.png".formatted(UUID.randomUUID());
       try {
         final UploadResponse result = restApiClient.startUpload(new StartUploadRequest(
             fileName,
             runner,
             context,
             null));
-        long uploadId = result.getUploadId();
+        final long uploadId = result.getUploadId();
         final String correlationId = result.getCorrelationId();
         runner.$(echo("Started upload with id %s (CorrelationId = %s)".formatted(
             uploadId,
@@ -55,7 +55,7 @@ public class UploadIT extends TestNGCitrusSpringSupport {
 
         try {
           final String fileNameToLoad = config.getFileToUpload();
-          int parts = config.getNPartsPerUpload();
+          final int parts = config.getNPartsPerUpload();
           final byte[] fileContentToUpload =
               new ClassPathResource(config.getFileToUpload()).getInputStream().readAllBytes();
           restApiClient.uploadFileInParts(new UploadFileInPartsRequest(

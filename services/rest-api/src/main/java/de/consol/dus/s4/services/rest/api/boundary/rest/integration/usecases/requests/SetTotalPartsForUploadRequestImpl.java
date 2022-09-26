@@ -5,9 +5,8 @@ import lombok.ToString;
 import lombok.Value;
 
 @Value
-@ToString(exclude = "correlationId")
+@ToString
 public class SetTotalPartsForUploadRequestImpl implements SetTotalPartsForUploadRequest {
   long id;
   int totalParts;
-  String correlationId;
 }

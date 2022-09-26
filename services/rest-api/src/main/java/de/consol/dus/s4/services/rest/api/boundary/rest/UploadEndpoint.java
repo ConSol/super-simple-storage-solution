@@ -17,8 +17,6 @@ import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberAlre
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberIsBiggerThanTotalParts;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsAlreadySetException;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsSmallerThanMaxPartNumberException;
-import de.consol.dus.s4.services.rest.api.usecases.api.requests.DeleteUploadByIdRequest;
-import de.consol.dus.s4.services.rest.api.usecases.api.requests.GetAllUploadsRequest;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.UploadPart;
 import io.opentelemetry.api.trace.Span;
@@ -70,12 +68,14 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetAllUploadsRequestImpl(correlationId))
+    return Uni.createFrom().item(new GetAllUploadsRequestImpl())
         .onItem()
-            .transform(GetAllUploadsRequest::execute)
+            .transform(GetAllUploadsRequestImpl::execute)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
         .onItem()
             .transformToMulti(Multi.createFrom()::iterable)
+        .onItem()
+            .transform(UploadResponse::new)
         .collect()
             .asList()
         .onItem()
@@ -108,7 +108,7 @@ public class UploadEndpoint {
     // @formatter:off
     return Uni
         .createFrom()
-            .item(new CreateNewUploadRequestImpl(request.getFileName(), correlationId))
+            .item(new CreateNewUploadRequestImpl(request.getFileName()))
         .onItem()
             .transform(CreateNewUploadRequestImpl::execute)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
@@ -145,7 +145,7 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id, correlationId))
+    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id))
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
@@ -218,9 +218,9 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new DeleteUploadByIdRequestImpl(id, correlationId))
+    return Uni.createFrom().item(new DeleteUploadByIdRequestImpl(id))
         .onItem()
-            .invoke(DeleteUploadByIdRequest::execute)
+            .invoke(DeleteUploadByIdRequestImpl::execute)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
         .onItem()
             .transform(item -> Response.noContent())
@@ -267,7 +267,7 @@ public class UploadEndpoint {
     // @formatter:off
     return Uni
         .createFrom()
-            .item(new SetTotalPartsForUploadRequestImpl(id, request.getTotalParts(), correlationId))
+            .item(new SetTotalPartsForUploadRequestImpl(id, request.getTotalParts()))
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
@@ -304,7 +304,7 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id, correlationId))
+    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id))
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
@@ -362,8 +362,7 @@ public class UploadEndpoint {
             .transform(Unchecked.function(nothing -> new AddPartToUploadRequestImpl(
                 id,
                 request.getPartNumber(),
-                Files.readAllBytes(request.getContent().filePath()),
-                correlationId)))
+                Files.readAllBytes(request.getContent().filePath()))))
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
         .onItem()
             .transform(this::executeAndHandleFailures)
@@ -413,7 +412,7 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id, correlationId))
+    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id))
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
@@ -436,7 +435,7 @@ public class UploadEndpoint {
                 .header(
                     HttpHeaders.CONTENT_DISPOSITION,
                     "attachment; filename=\"%s.part_%010d\"".formatted(
-                        new GetUploadByIdRequestImpl(id, correlationId)
+                        new GetUploadByIdRequestImpl(id)
                             .execute()
                             .orElseThrow(() -> new NoSuchEntityException(Upload.class, id))
                             .getFileName(),
@@ -474,7 +473,7 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id, correlationId))
+    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id))
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())

@@ -24,7 +24,8 @@
   "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
-  "iteration": 1654533670072,
+  "id": 2,
+  "iteration": 1664221400079,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -445,8 +446,8 @@
       {
         "current": {
           "selected": true,
-          "text": "aggregator",
-          "value": "aggregator"
+          "text": "rest-api",
+          "value": "rest-api:8080"
         },
         "hide": 0,
         "includeAll": false,
@@ -454,12 +455,12 @@
         "name": "deployment",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "rest-api",
             "value": "rest-api:8080"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "aggregator",
             "value": "aggregator:8081"
           }

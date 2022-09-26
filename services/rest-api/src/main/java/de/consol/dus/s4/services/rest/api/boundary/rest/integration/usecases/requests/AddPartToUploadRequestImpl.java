@@ -5,10 +5,9 @@ import lombok.ToString;
 import lombok.Value;
 
 @Value
-@ToString(exclude = {"content", "correlationId"})
+@ToString(exclude = {"content"})
 public class AddPartToUploadRequestImpl implements AddPartToUploadRequest {
   long id;
   int partNumber;
   byte[] content;
-  String correlationId;
 }
