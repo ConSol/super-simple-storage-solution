@@ -11,6 +11,7 @@ import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.CreateNewUpl
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetStatusOfUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetTotalPartsForUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.responses.Upload;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import lombok.AllArgsConstructor;
 public class UploadDaoImpl implements UploadDao {
   private final UploadRepository repository;
 
+  @WithSpan
   @Transactional
   @Override
   public Upload createNewUpload(CreateNewUploadRequest request) {
@@ -32,12 +34,14 @@ public class UploadDaoImpl implements UploadDao {
         .orElseThrow();
   }
 
+  @WithSpan
   @Transactional
   @Override
   public Optional<Upload> getById(long id) {
     return repository.findById(id).map(UploadImpl::new);
   }
 
+  @WithSpan
   @Transactional
   @Override
   public void deleteById(long id) {
@@ -48,6 +52,7 @@ public class UploadDaoImpl implements UploadDao {
     }
   }
 
+  @WithSpan
   @Override
   public Optional<Upload> addPartToUpload(AddPartToUploadRequest request)
       throws PartNumberAlreadyExistsException, PartNumberIsBiggerThanTotalParts {
@@ -99,6 +104,7 @@ public class UploadDaoImpl implements UploadDao {
     return false;
   }
 
+  @WithSpan
   @Transactional
   @Override
   public Collection<Upload> getAll() {
@@ -108,6 +114,7 @@ public class UploadDaoImpl implements UploadDao {
         .toList();
   }
 
+  @WithSpan
   @Transactional
   @Override
   public Optional<Upload> setTotalPartsForUpload(SetTotalPartsForUploadRequest request) {
@@ -116,6 +123,7 @@ public class UploadDaoImpl implements UploadDao {
         .map(UploadImpl::new);
   }
 
+  @WithSpan
   @Transactional
   @Override
   public void setStatusOfUpload(SetStatusOfUploadRequest request) {

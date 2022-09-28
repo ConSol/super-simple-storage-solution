@@ -1,28 +1,27 @@
 package de.consol.dus.s4.services.aggregator.usecases;
 
-import de.consol.dus.s4.services.aggregator.usecases.api.exceptions.SingletonNotInitializedError;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.UploadDao;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.requests.WriteContentAndReleasePartsRequest;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.Upload;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.UploadPart;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.UploadStatus;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+import javax.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 
+@ApplicationScoped
 @RequiredArgsConstructor
 public class AggregateUploadDataUseCase {
-  private static final AtomicReference<AggregateUploadDataUseCase> INSTANCE =
-      new AtomicReference<>();
-
   private final UploadDao dao;
   private final Logger logger;
 
+  @WithSpan
   public void execute(long id) {
     logger.info("Received request to aggregate parts of Upload with id {}", id);
     final Optional<Upload> maybeUpload = dao.getById(id);
@@ -107,31 +106,5 @@ public class AggregateUploadDataUseCase {
       return false;
     }
     return true;
-  }
-
-  public static AggregateUploadDataUseCase getInitializedInstance() {
-    try {
-      return getInstance(null, null);
-    } catch (IllegalStateException cause) {
-      throw new SingletonNotInitializedError(cause);
-    }
-  }
-
-  public static AggregateUploadDataUseCase getInstance(UploadDao dao, Logger logger) {
-    if (Objects.isNull(INSTANCE.get())) {
-      synchronized (AggregateUploadDataUseCase.class) {
-        if (Objects.isNull(INSTANCE.get())) {
-          if (Objects.isNull(dao) || Objects.isNull(logger)) {
-            throw new IllegalStateException(
-                "nulls are only allowed when the singleton is initialized. The singleton is not "
-                    + " yet initialized. Please call static method "
-                    + "AggregateUploadDataUseCase.getInstance(UploadDao, Logger) with non-null "
-                    + "parameters.");
-          }
-          INSTANCE.set(new AggregateUploadDataUseCase(dao, logger));
-        }
-      }
-    }
-    return INSTANCE.get();
   }
 }

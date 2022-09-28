@@ -20,6 +20,9 @@ import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsSmal
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.UploadPart;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.quarkus.opentelemetry.runtime.QuarkusContextStorage;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
@@ -164,7 +167,8 @@ public class UploadEndpoint {
   }
 
   private Upload executeAndHandleFailures(SetTotalPartsForUploadRequestImpl request) {
-    try {
+    try (@SuppressWarnings("unused")
+         final Scope scope = QuarkusContextStorage.INSTANCE.attach(Context.current())) {
       return request.execute()
           .orElseThrow(() -> new NoSuchEntityException(Upload.class, request.getId()));
     } catch (TotalPartsSmallerThanMaxPartNumberException e) {

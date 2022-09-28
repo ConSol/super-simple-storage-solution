@@ -1,6 +1,5 @@
 package de.consol.dus.s4.services.rest.api.usecases;
 
-import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.SingletonNotInitializedError;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsAlreadySetException;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsSmallerThanMaxPartNumberException;
 import de.consol.dus.s4.services.rest.api.usecases.api.requests.SetTotalPartsForUploadRequest;
@@ -8,20 +7,20 @@ import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.UploadPart;
 import de.consol.dus.s4.services.rest.api.usecases.internal.api.EnterProcessingRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import lombok.AccessLevel;
+import javax.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@ApplicationScoped
+@RequiredArgsConstructor
 public class SetTotalPartsUseCase {
-  private static final AtomicReference<SetTotalPartsUseCase> INSTANCE = new AtomicReference<>();
-
   private final UploadDao dao;
   private final Logger logger;
 
+  @WithSpan
   public Optional<Upload> execute(SetTotalPartsForUploadRequest request)
       throws TotalPartsAlreadySetException, TotalPartsSmallerThanMaxPartNumberException {
     logger.info("Received request: {}", request);
@@ -73,31 +72,5 @@ public class SetTotalPartsUseCase {
           totalPartsFromRequest,
           maxPartNumber);
     }
-  }
-
-  public static SetTotalPartsUseCase getInitializedInstance() {
-    try {
-      return getInstance(null, null);
-    } catch (IllegalStateException cause) {
-      throw new SingletonNotInitializedError(cause);
-    }
-  }
-
-  public static SetTotalPartsUseCase getInstance(UploadDao dao, Logger logger) {
-    if (Objects.isNull(INSTANCE.get())) {
-      synchronized (SetTotalPartsUseCase.class) {
-        if (Objects.isNull(INSTANCE.get())) {
-          if (Objects.isNull(dao) || Objects.isNull(logger)) {
-            throw new IllegalStateException(
-                "nulls are only allowed when the singleton is initialized. The singleton is not "
-                    + " yet initialized. Please call static method "
-                    + "SetTotalPartsUseCase.getInstance(UploadDao, Logger) with non-null "
-                    + "parameters.");
-          }
-          INSTANCE.set(new SetTotalPartsUseCase(dao, logger));
-        }
-      }
-    }
-    return INSTANCE.get();
   }
 }

@@ -5,12 +5,13 @@ import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberAlre
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberIsBiggerThanTotalParts;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import java.util.Optional;
+import javax.enterprise.inject.spi.CDI;
 
 public interface AddPartToUploadRequest extends
     de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.AddPartToUploadRequest {
 
   default Optional<Upload> execute()
       throws PartNumberAlreadyExistsException, PartNumberIsBiggerThanTotalParts {
-    return AddPartToUploadUseCase.getInitializedInstance().execute(this);
+    return CDI.current().select(AddPartToUploadUseCase.class).get().execute(this);
   }
 }

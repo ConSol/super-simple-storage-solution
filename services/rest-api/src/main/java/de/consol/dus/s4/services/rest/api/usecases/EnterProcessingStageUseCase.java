@@ -1,27 +1,26 @@
 package de.consol.dus.s4.services.rest.api.usecases;
 
-import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.SingletonNotInitializedError;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.Upload;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.UploadStatus;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetStatusOfUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.messaging.UploadReadyForProcessingEmitter;
 import de.consol.dus.s4.services.rest.api.usecases.spi.messaging.requests.SendUploadReadyForProcessingRequest;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+import javax.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 
+@ApplicationScoped
 @RequiredArgsConstructor
 public class EnterProcessingStageUseCase {
-  private static final AtomicReference<EnterProcessingStageUseCase> INSTANCE =
-      new AtomicReference<>();
-
   private final UploadDao dao;
   private final Logger logger;
   private final UploadReadyForProcessingEmitter emitter;
 
+  @WithSpan
   public void execute(long id) {
     try {
       logger.info("Received request to check if Upload with id {} can be processed", id);
@@ -94,34 +93,5 @@ public class EnterProcessingStageUseCase {
 
   private void setStatusToProcessing(long id) {
     dao.setStatusOfUpload(new SetStatusOfUploadRequest(id, UploadStatus.PROCESSING));
-  }
-
-  public static EnterProcessingStageUseCase getInitializedInstance() {
-    try {
-      return getInstance(null, null, null);
-    } catch (IllegalStateException cause) {
-      throw new SingletonNotInitializedError(cause);
-    }
-  }
-
-  public static EnterProcessingStageUseCase getInstance(
-      UploadDao dao,
-      Logger logger,
-      UploadReadyForProcessingEmitter emitter) {
-    if (Objects.isNull(INSTANCE.get())) {
-      synchronized (EnterProcessingStageUseCase.class) {
-        if (Objects.isNull(INSTANCE.get())) {
-          if (Objects.isNull(dao) || Objects.isNull(logger) || Objects.isNull(emitter)) {
-            throw new IllegalStateException(
-                "nulls are only allowed when the singleton is initialized. The singleton is not "
-                    + " yet initialized. Please call static method "
-                    + "EnterProcessingStageUseCase.getInstance(UploadDao, Logger) with non-null "
-                    + "parameters.");
-          }
-          INSTANCE.set(new EnterProcessingStageUseCase(dao, logger, emitter));
-        }
-      }
-    }
-    return INSTANCE.get();
   }
 }

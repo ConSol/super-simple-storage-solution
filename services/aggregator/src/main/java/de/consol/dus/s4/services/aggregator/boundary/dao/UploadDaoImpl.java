@@ -6,6 +6,7 @@ import de.consol.dus.s4.services.aggregator.usecases.spi.dao.UploadDao;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.requests.WriteContentAndReleasePartsRequest;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.Upload;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.UploadStatus;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
@@ -18,12 +19,14 @@ public class UploadDaoImpl implements UploadDao {
   private final UploadRepository repository;
   private final Logger logger;
 
+  @WithSpan
   @Transactional
   @Override
   public Optional<Upload> getById(long id) {
     return repository.findById(id).map(UploadImpl::new);
   }
 
+  @WithSpan
   @Transactional
   @Override
   public void writeContentAndDeletePartsAndSetStatusToDone(

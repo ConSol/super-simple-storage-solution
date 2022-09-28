@@ -1,4 +1,8 @@
 quarkus:
+  arc:
+    unremovable-types: >-
+      de.consol.dus.s4.services.aggregator.usecases.*,
+      de.consol.dus.s4.services.aggregator.boundary.dao.*
   datasource:
     db-kind: postgresql
     username: ${DB_USERNAME:upload}

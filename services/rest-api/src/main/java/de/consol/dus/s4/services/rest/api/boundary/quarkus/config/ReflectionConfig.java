@@ -14,7 +14,6 @@ import de.consol.dus.s4.services.rest.api.boundary.rest.request.StartUploadReque
 import de.consol.dus.s4.services.rest.api.boundary.rest.response.UploadResponse;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberAlreadyExistsException;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberIsBiggerThanTotalParts;
-import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.SingletonNotInitializedError;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsAlreadySetException;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsSmallerThanMaxPartNumberException;
 import de.consol.dus.s4.services.rest.api.usecases.internal.api.EnterProcessingRequest;
@@ -38,7 +37,6 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
     UploadResponse.class,
     PartNumberAlreadyExistsException.class,
     PartNumberIsBiggerThanTotalParts.class,
-    SingletonNotInitializedError.class,
     TotalPartsAlreadySetException.class,
     TotalPartsSmallerThanMaxPartNumberException.class,
     EnterProcessingRequest.class,
