@@ -15,14 +15,17 @@ public final class UploadImpl implements Upload {
   @Getter(AccessLevel.PRIVATE)
   private final UploadEntity delegate;
 
+  @SuppressWarnings("unused")
   public long getId() {
     return getDelegate().getId();
   }
 
+  @SuppressWarnings("unused")
   public String getFileName() {
     return getDelegate().getFileName();
   }
 
+  @SuppressWarnings("unused")
   public List<UploadPart> getParts() {
     return Optional.of(getDelegate())
         .map(UploadEntity::getParts)
@@ -33,14 +36,17 @@ public final class UploadImpl implements Upload {
         .toList();
   }
 
+  @SuppressWarnings("unused")
   public UploadStatus getStatus() {
     return getDelegate().getStatus();
   }
 
+  @SuppressWarnings("unused")
   public Integer getTotalParts() {
     return getDelegate().getTotalParts();
   }
 
+  @SuppressWarnings("unused")
   public byte[] getContent() {
     return getDelegate().getContent();
   }

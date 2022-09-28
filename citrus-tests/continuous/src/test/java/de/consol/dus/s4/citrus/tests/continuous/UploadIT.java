@@ -48,11 +48,11 @@ public class UploadIT extends TestNGCitrusSpringSupport {
       try {
         final UploadResponse result = restApiClient.startUpload(new StartUploadRequest(
             fileName,
+            null,
             runner,
-            context,
-            null));
-        final long uploadId = result.getUploadId();
-        final String correlationId = result.getCorrelationId();
+            context));
+        final long uploadId = result.uploadId();
+        final String correlationId = result.correlationId();
         runner.$(echo("Started upload with id %s (CorrelationId = %s)".formatted(
             uploadId,
             correlationId)));

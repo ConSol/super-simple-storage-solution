@@ -7,6 +7,7 @@ import lombok.experimental.Delegate;
 
 @AllArgsConstructor
 public class UploadPartImpl implements UploadPart {
+  @SuppressWarnings("unused")
   @Delegate(types = UploadPart.class)
   private final UploadPartEntity delegate;
 }

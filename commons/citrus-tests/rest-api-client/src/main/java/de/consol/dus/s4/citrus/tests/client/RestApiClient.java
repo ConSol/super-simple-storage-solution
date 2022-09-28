@@ -56,8 +56,8 @@ public class RestApiClient {
   }
 
   public UploadResponse startUpload(StartUploadRequest request) {
-    final TestCaseRunner runner = request.getRunner();
-    final String fileName = request.getFileName();
+    final TestCaseRunner runner = request.runner();
+    final String fileName = request.fileName();
     runner.$(echo("Creating new upload"));
     // @formatter:off
     runner.$(http()
@@ -65,7 +65,7 @@ public class RestApiClient {
         .send()
             .post("/uploads")
             .message()
-                .headers(addCorrelationIdHeader(new HashMap<>(), request.getCorrelationId()))
+                .headers(addCorrelationIdHeader(new HashMap<>(), request.correlationId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body("""
                       {
@@ -97,8 +97,8 @@ public class RestApiClient {
     // @formatter:on
 
     return new UploadResponse(
-        Long.parseLong(request.getContext().getVariable(uploadIdVariableName)),
-        request.getContext().getVariable(correlationIdVariableName));
+        Long.parseLong(request.context().getVariable(uploadIdVariableName)),
+        request.context().getVariable(correlationIdVariableName));
   }
 
   private Map<String, Object> addCorrelationIdHeader(
@@ -117,8 +117,8 @@ public class RestApiClient {
 
   private ArrayList<UploadPartRequest> constructPartRequests(UploadFileInPartsRequest request)
       throws IOException {
-    final int byteLength = request.getContent().length;
-    final int parts = request.getParts();
+    final int byteLength = request.content().length;
+    final int parts = request.parts();
     final int bytesPerPart = (byteLength + parts - 1) / parts;
     final int howManyOneLess = bytesPerPart * parts - byteLength;
     final int oneByteLessStartingAtIndex = parts - howManyOneLess;
@@ -128,33 +128,33 @@ public class RestApiClient {
       final int partId = part + 1;
       final int byteSize = bytesPerPart - (part < oneByteLessStartingAtIndex ? 0 : 1);
       byte[] contentForPartId = new byte[byteSize];
-      System.arraycopy(request.getContent(), offset, contentForPartId, 0, byteSize);
+      System.arraycopy(request.content(), offset, contentForPartId, 0, byteSize);
       offset += byteSize;
       Path tempFile = Files.createTempFile(UUID.randomUUID().toString(), ".tmp");
       Files.write(tempFile, contentForPartId);
       requests.add(new UploadPartRequest(
-          request.getUploadId(),
+          request.uploadId(),
           partId,
           tempFile,
-          request.getCorrelationId(),
-          request.getRunner(),
-          request.getContext()));
+          request.correlationId(),
+          request.runner(),
+          request.context()));
     }
     return requests;
   }
 
   public UploadResponse uploadPart(UploadPartRequest request) {
     new ClassPathResource("foobar");
-    final TestCaseRunner runner = request.getRunner();
+    final TestCaseRunner runner = request.runner();
     // @formatter:off
     LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-    body.add("partNumber", request.getPartNumber());
-    body.add("content", new FileSystemResource(request.getContent()));
+    body.add("partNumber", request.partNumber());
+    body.add("content", new FileSystemResource(request.content()));
     runner.$(http().client(httpClient)
         .send()
-            .post("/uploads/%s/parts".formatted(request.getUploadId()))
+            .post("/uploads/%s/parts".formatted(request.uploadId()))
             .message()
-                .headers(addCorrelationIdHeader(new HashMap<>(), request.getCorrelationId()))
+                .headers(addCorrelationIdHeader(new HashMap<>(), request.correlationId()))
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 .body(body));
     // @formatter:on
@@ -178,26 +178,26 @@ public class RestApiClient {
                 .extract(fromBody().expression("$.id", uploadIdVariableName)));
     // @formatter:on
 
-    final TestContext context = request.getContext();
+    final TestContext context = request.context();
     final String correlationId = context.getVariable(correlationIdVariableName);
     long uploadId = Long.parseLong(context.getVariable(uploadIdVariableName));
     return new UploadResponse(uploadId, correlationId);
   }
 
   public UploadResponse setTotalParts(SetTotalPartsRequest request) {
-    final TestCaseRunner runner = request.getRunner();
+    final TestCaseRunner runner = request.runner();
     // @formatter:off
     runner.$(http().client(httpClient)
         .send()
-            .put("/uploads/%s/totalParts".formatted(request.getUploadId()))
+            .put("/uploads/%s/totalParts".formatted(request.uploadId()))
             .message()
-                .headers(addCorrelationIdHeader(new HashMap<>(), request.getCorrelationId()))
+                .headers(addCorrelationIdHeader(new HashMap<>(), request.correlationId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body("""
                 {
                   "totalParts": %d
                 }
-                """.formatted(request.getTotalParts())));
+                """.formatted(request.totalParts())));
     // @formatter:on
 
     final UUID internalOperationId = UUID.randomUUID();
@@ -212,26 +212,26 @@ public class RestApiClient {
                 .validate(jsonPath()
                     .expression("$.id", "@isNumber()@")
                     .expression("$.partsReceived", "@isNumber()@")
-                    .expression("$.totalParts", request.getTotalParts()))
+                    .expression("$.totalParts", request.totalParts()))
                 .extract(fromHeaders()
                     .expression("X-Correlation-ID", correlationIdVariableName))
                 .extract(fromBody().expression("$.id", uploadIdVariableName)));
     // @formatter:on
 
-    final TestContext context = request.getContext();
+    final TestContext context = request.context();
     final String correlationId = context.getVariable(correlationIdVariableName);
     long uploadId = Long.parseLong(context.getVariable(uploadIdVariableName));
     return new UploadResponse(uploadId, correlationId);
   }
 
   public GetUploadContentResponse getUploadContent(GetUploadContentRequest request) {
-    final TestCaseRunner runner = request.getRunner();
+    final TestCaseRunner runner = request.runner();
     // @formatter:off
     runner.$(http().client(httpClient)
         .send()
-            .get("/uploads/%d/content".formatted(request.getUploadId()))
+            .get("/uploads/%d/content".formatted(request.uploadId()))
             .message()
-                .headers(addCorrelationIdHeader(new HashMap<>(), request.getCorrelationId())));
+                .headers(addCorrelationIdHeader(new HashMap<>(), request.correlationId())));
     // @formatter:on
 
     final UUID internalOperationId = UUID.randomUUID();
@@ -251,23 +251,23 @@ public class RestApiClient {
                     .expression("X-Correlation-ID", correlationIdVariableName)));
     // @formatter:on
 
-    final TestContext context = request.getContext();
+    final TestContext context = request.context();
     final String contentDispositionHeader = context.getVariable(contentDispositionVariableName);
     assertThat(contentDispositionHeader)
-        .contains("attachment; filename=\"%s\"".formatted(request.getFileName()));
+        .contains("attachment; filename=\"%s\"".formatted(request.fileName()));
     return new GetUploadContentResponse(context.getVariable(correlationIdVariableName));
   }
 
   public void waitForUploadDone(WaitForUploadDoneRequest request) {
-    final TestCaseRunner runner = request.getRunner();
+    final TestCaseRunner runner = request.runner();
     // @formatter:off
-    final long uploadId = request.getUploadId();
-    final int retries = request.getRetries();
-    final String correlationId = request.getCorrelationId();
+    final long uploadId = request.uploadId();
+    final int retries = request.retries();
+    final String correlationId = request.correlationId();
     runner.$(repeatOnError()
         .until("i = %d".formatted(retries))
         .index("i")
-        .autoSleep(request.getTimeout())
+        .autoSleep(request.timeout())
         .actions(
             echo(
                 "Checking upload with id %d status ${i} / %d (CorrelationID = %s)".formatted(
@@ -297,14 +297,14 @@ public class RestApiClient {
 
   public String deleteUpload(DeleteUploadRequest request) {
     // @formatter:off
-    final TestCaseRunner runner = request.getRunner();
+    final TestCaseRunner runner = request.runner();
     runner.$(http()
         .client(httpClient)
         .send()
-            .delete("/uploads/%s".formatted(request.getId()))
+            .delete("/uploads/%s".formatted(request.id()))
             .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .headers(addCorrelationIdHeader(new HashMap<>(), request.getCorrelationId())));
+                .headers(addCorrelationIdHeader(new HashMap<>(), request.correlationId())));
     // @formatter:on
 
     final UUID internalOperationId = UUID.randomUUID();
@@ -320,6 +320,6 @@ public class RestApiClient {
                     .expression("X-Correlation-ID", correlationIdVariableName)));
     // @formatter:on
 
-    return request.getContext().getVariable(correlationIdVariableName);
+    return request.context().getVariable(correlationIdVariableName);
   }
 }

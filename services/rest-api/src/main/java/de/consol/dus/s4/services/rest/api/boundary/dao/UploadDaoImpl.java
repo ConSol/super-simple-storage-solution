@@ -28,7 +28,7 @@ public class UploadDaoImpl implements UploadDao {
   @Transactional
   @Override
   public Upload createNewUpload(CreateNewUploadRequest request) {
-    return Optional.of(new UploadEntity().setFileName(request.getFileName()))
+    return Optional.of(new UploadEntity().setFileName(request.fileName()))
         .map(repository::save)
         .map(UploadImpl::new)
         .orElseThrow();
@@ -64,8 +64,8 @@ public class UploadDaoImpl implements UploadDao {
           UploadPartEntity.UNIQUE_CONSTRAINT_UPLOAD_PART_NAME);
       if (isConstraintViolationException) {
         throw new PartNumberAlreadyExistsException(
-            request.getId(),
-            request.getPartNumber());
+            request.id(),
+            request.partNumber());
       }
       throw exception;
     }
@@ -74,23 +74,23 @@ public class UploadDaoImpl implements UploadDao {
   @Transactional
   Optional<Upload> fetchUploadAndAddPart(AddPartToUploadRequest request)
       throws PartNumberIsBiggerThanTotalParts {
-    final Optional<UploadEntity> maybeExisting = repository.findById(request.getId());
+    final Optional<UploadEntity> maybeExisting = repository.findById(request.id());
     if (maybeExisting.isEmpty()) {
       return Optional.empty();
     }
     final UploadEntity existing = maybeExisting.get();
     final int totalParts =
         Optional.of(existing).map(UploadEntity::getTotalParts).orElse(Integer.MAX_VALUE);
-    if (request.getPartNumber() > totalParts) {
+    if (request.partNumber() > totalParts) {
       throw new PartNumberIsBiggerThanTotalParts(
           existing.getId(),
           totalParts,
-          request.getPartNumber());
+          request.partNumber());
     }
     existing.getParts().add(new UploadPartEntity()
         .setUpload(existing)
-        .setPartNumber(request.getPartNumber())
-        .setContent(request.getContent()));
+        .setPartNumber(request.partNumber())
+        .setContent(request.content()));
     return Optional.of(existing).map(UploadImpl::new);
   }
 
@@ -118,8 +118,8 @@ public class UploadDaoImpl implements UploadDao {
   @Transactional
   @Override
   public Optional<Upload> setTotalPartsForUpload(SetTotalPartsForUploadRequest request) {
-    return repository.findById(request.getId())
-        .map(upload -> upload.setTotalParts(request.getTotalParts()))
+    return repository.findById(request.id())
+        .map(upload -> upload.setTotalParts(request.totalParts()))
         .map(UploadImpl::new);
   }
 
@@ -127,7 +127,7 @@ public class UploadDaoImpl implements UploadDao {
   @Transactional
   @Override
   public void setStatusOfUpload(SetStatusOfUploadRequest request) {
-    repository.findById(request.getId())
-        .ifPresent(entity -> entity.setStatus(request.getStatus()));
+    repository.findById(request.id())
+        .ifPresent(entity -> entity.setStatus(request.status()));
   }
 }

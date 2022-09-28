@@ -2,6 +2,7 @@ package de.consol.dus.s4.commons.opentelemetry.messaging.amqp;
 
 import de.consol.dus.s4.commons.correlation.http.exceptions.filter.container.RequestFilter;
 import io.opentelemetry.context.Scope;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.quarkus.opentelemetry.runtime.QuarkusContextStorage;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.TracingMetadata;
@@ -29,6 +30,7 @@ public abstract class TracedAmqpReceiver<T> {
     this.executor = executor;
   }
 
+  @WithSpan
   protected abstract void callback(Message<T> message);
 
   protected CompletionStage<Void> extractContextAndCallback(Message<T> received) {

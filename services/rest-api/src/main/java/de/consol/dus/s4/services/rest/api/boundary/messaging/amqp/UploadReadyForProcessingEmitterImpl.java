@@ -26,7 +26,7 @@ public class UploadReadyForProcessingEmitterImpl extends TracedAmqpEmitter<Uploa
 
   @Override
   public void emit(SendUploadReadyForProcessingRequest request) {
-    emit(Message.of(new UploadReadyForProcessing(request.getId()))
+    emit(Message.of(new UploadReadyForProcessing(request.id()))
         .addMetadata(OutgoingAmqpMetadata.builder()
             .withCorrelationId(MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY).toString())
             .build()));

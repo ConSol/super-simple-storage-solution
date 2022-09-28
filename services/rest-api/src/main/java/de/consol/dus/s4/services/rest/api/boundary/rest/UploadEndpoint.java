@@ -5,14 +5,17 @@ import de.consol.dus.s4.commons.http.exceptions.ConflictException;
 import de.consol.dus.s4.commons.http.exceptions.NoSuchEntityException;
 import de.consol.dus.s4.services.rest.api.boundary.rest.integration.usecases.requests.AddPartToUploadRequestImpl;
 import de.consol.dus.s4.services.rest.api.boundary.rest.integration.usecases.requests.CreateNewUploadRequestImpl;
-import de.consol.dus.s4.services.rest.api.boundary.rest.integration.usecases.requests.DeleteUploadByIdRequestImpl;
-import de.consol.dus.s4.services.rest.api.boundary.rest.integration.usecases.requests.GetAllUploadsRequestImpl;
-import de.consol.dus.s4.services.rest.api.boundary.rest.integration.usecases.requests.GetUploadByIdRequestImpl;
 import de.consol.dus.s4.services.rest.api.boundary.rest.integration.usecases.requests.SetTotalPartsForUploadRequestImpl;
 import de.consol.dus.s4.services.rest.api.boundary.rest.request.AddPartToUploadRequest;
 import de.consol.dus.s4.services.rest.api.boundary.rest.request.SetTotalPartsOfUploadRequest;
 import de.consol.dus.s4.services.rest.api.boundary.rest.request.StartUploadRequest;
 import de.consol.dus.s4.services.rest.api.boundary.rest.response.UploadResponse;
+import de.consol.dus.s4.services.rest.api.usecases.AddPartToUploadUseCase;
+import de.consol.dus.s4.services.rest.api.usecases.CreateNewUploadUseCase;
+import de.consol.dus.s4.services.rest.api.usecases.DeleteUploadByIdUseCase;
+import de.consol.dus.s4.services.rest.api.usecases.GetAllUploadsUseCase;
+import de.consol.dus.s4.services.rest.api.usecases.GetUploadByIdUseCase;
+import de.consol.dus.s4.services.rest.api.usecases.SetTotalPartsUseCase;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberAlreadyExistsException;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.PartNumberIsBiggerThanTotalParts;
 import de.consol.dus.s4.services.rest.api.usecases.api.exceptions.TotalPartsAlreadySetException;
@@ -59,6 +62,13 @@ import org.slf4j.MDC;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor
 public class UploadEndpoint {
+  private final AddPartToUploadUseCase addPartToUploadUseCase;
+  private final CreateNewUploadUseCase createNewUploadUseCase;
+  private final DeleteUploadByIdUseCase deleteUploadByIdUseCase;
+  private final GetAllUploadsUseCase getAllUploadsUseCase;
+  private final GetUploadByIdUseCase getUploadByIdUseCase;
+  private final SetTotalPartsUseCase setTotalPartsUseCase;
+
   @Operation(summary = "Gets all uploads.", operationId = "getAllUploads")
   @APIResponse(ref = "uploadListOk")
   @APIResponse(ref = "ise")
@@ -71,9 +81,9 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetAllUploadsRequestImpl())
+    return Uni.createFrom().item(getAllUploadsUseCase)
         .onItem()
-            .transform(GetAllUploadsRequestImpl::execute)
+            .transform(GetAllUploadsUseCase::execute)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
         .onItem()
             .transformToMulti(Multi.createFrom()::iterable)
@@ -113,7 +123,7 @@ public class UploadEndpoint {
         .createFrom()
             .item(new CreateNewUploadRequestImpl(request.getFileName()))
         .onItem()
-            .transform(CreateNewUploadRequestImpl::execute)
+            .transform(createNewUploadUseCase::execute)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
         .onItem()
             .transform(UploadResponse::new)
@@ -148,7 +158,7 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id))
+    return Uni.createFrom().item(id)
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
@@ -161,16 +171,15 @@ public class UploadEndpoint {
     // @formatter:on
   }
 
-  private Upload executeAndHandleFailures(GetUploadByIdRequestImpl request) {
-    return request.execute()
-        .orElseThrow(() -> new NoSuchEntityException(Upload.class, request.getId()));
+  private Upload executeAndHandleFailures(long id) {
+    return getUploadByIdUseCase.execute(id)
+        .orElseThrow(() -> new NoSuchEntityException(Upload.class, id));
   }
 
   private Upload executeAndHandleFailures(SetTotalPartsForUploadRequestImpl request) {
-    try (@SuppressWarnings("unused")
-         final Scope scope = QuarkusContextStorage.INSTANCE.attach(Context.current())) {
-      return request.execute()
-          .orElseThrow(() -> new NoSuchEntityException(Upload.class, request.getId()));
+    try (@SuppressWarnings("unused") final Scope scope =
+             QuarkusContextStorage.INSTANCE.attach(Context.current())) {
+      return setTotalPartsUseCase.execute(request);
     } catch (TotalPartsSmallerThanMaxPartNumberException e) {
       throw new ConflictException(
           "largest part number is already %d".formatted(e.getMaxPartNumber()),
@@ -183,11 +192,11 @@ public class UploadEndpoint {
 
   private Upload executeAndHandleFailures(AddPartToUploadRequestImpl request) {
     try {
-      return request.execute()
-          .orElseThrow(() -> new NoSuchEntityException(Upload.class, request.getId()));
+      return addPartToUploadUseCase.execute(request)
+          .orElseThrow(() -> new NoSuchEntityException(Upload.class, request.id()));
     } catch (PartNumberAlreadyExistsException e) {
       throw new ConflictException(
-          "part with number %d already exists".formatted(request.getPartNumber()),
+          "part with number %d already exists".formatted(request.partNumber()),
           e);
     } catch (PartNumberIsBiggerThanTotalParts e) {
       throw new ConflictException(
@@ -222,9 +231,9 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new DeleteUploadByIdRequestImpl(id))
+    return Uni.createFrom().item(id)
         .onItem()
-            .invoke(DeleteUploadByIdRequestImpl::execute)
+            .invoke(deleteUploadByIdUseCase::execute)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
         .onItem()
             .transform(item -> Response.noContent())
@@ -308,7 +317,7 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id))
+    return Uni.createFrom().item(id)
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
@@ -416,7 +425,7 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id))
+    return Uni.createFrom().item(id)
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
@@ -439,8 +448,8 @@ public class UploadEndpoint {
                 .header(
                     HttpHeaders.CONTENT_DISPOSITION,
                     "attachment; filename=\"%s.part_%010d\"".formatted(
-                        new GetUploadByIdRequestImpl(id)
-                            .execute()
+                        getUploadByIdUseCase
+                            .execute(id)
                             .orElseThrow(() -> new NoSuchEntityException(Upload.class, id))
                             .getFileName(),
                         partNumber))
@@ -477,7 +486,7 @@ public class UploadEndpoint {
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
     // @formatter:off
-    return Uni.createFrom().item(new GetUploadByIdRequestImpl(id))
+    return Uni.createFrom().item(id)
         .onItem()
             .transform(this::executeAndHandleFailures)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())

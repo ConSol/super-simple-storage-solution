@@ -31,12 +31,12 @@ public class UploadDaoImpl implements UploadDao {
   @Override
   public void writeContentAndDeletePartsAndSetStatusToDone(
       WriteContentAndReleasePartsRequest request) {
-    final Optional<UploadEntity> maybeUpload = repository.findById(request.getId());
+    final Optional<UploadEntity> maybeUpload = repository.findById(request.id());
     if (maybeUpload.isEmpty()) {
-      logger.info("Upload with id {} does not exist", request.getId());
+      logger.info("Upload with id {} does not exist", request.id());
       return;
     }
-    final UploadEntity upload = maybeUpload.get().setContent(request.getContent());
+    final UploadEntity upload = maybeUpload.get().setContent(request.content());
     upload.getParts().clear();
     upload.setStatus(UploadStatus.DONE);
   }

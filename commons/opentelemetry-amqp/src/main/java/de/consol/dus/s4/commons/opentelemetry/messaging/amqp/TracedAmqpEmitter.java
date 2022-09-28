@@ -1,6 +1,7 @@
 package de.consol.dus.s4.commons.opentelemetry.messaging.amqp;
 
 import io.opentelemetry.context.Context;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.TracingMetadata;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class TracedAmqpEmitter<T> {
     this.logger = logger;
   }
 
+  @WithSpan
   protected void emit(Message<T> message) {
     // @formatter:off
     Uni.createFrom().item(message)
