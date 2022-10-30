@@ -1,5 +1,5 @@
-# 1.0
-FROM quay.io/quarkus/quarkus-micro-image@sha256:bc172982173253eebcc9483c3fc092d6272e79b97273a201a197738cd1bcaf75
+# 2.0
+FROM quay.io/quarkus/quarkus-micro-image@sha256:8b22a0cadc42d2140ceb35175c9fed6cafc7f46edcbb9c1044cab974ca470310
 
 COPY --chown=185 target/emptydir /deployment
 COPY --chown=185 target/*-runner /deployment/quarkus-run
