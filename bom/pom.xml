@@ -15,23 +15,23 @@
     <properties>
         <!-- Plugins -->
         <antrun-plugin.version>3.1.0</antrun-plugin.version>
-        <checkstyle-version>10.3</checkstyle-version>
-        <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
+        <checkstyle-version>10.9.3</checkstyle-version>
+        <checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <flyway-plugin.version>8.5.12</flyway-plugin.version>
-        <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+        <flyway-plugin.version>9.16.3</flyway-plugin.version>
+        <surefire-plugin.version>3.0.0-M9</surefire-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <quarkus.platform.version>2.16.6.Final</quarkus.platform.version>
 
         <!-- Dependencies -->
-        <archunit.version>0.23.1</archunit.version>
+        <archunit.version>1.0.1</archunit.version>
         <citrus.version>3.2.1</citrus.version>
         <citrus-log4j.version>2.19.0</citrus-log4j.version>
         <citrus-spring-test.version>5.3.15</citrus-spring-test.version>
-        <org.projectlombok.version>1.18.20</org.projectlombok.version>
-        <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+        <org.projectlombok.version>1.18.26</org.projectlombok.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <truth.version>1.1.3</truth.version>
 
         <!-- Project setup -->
@@ -94,7 +94,7 @@
                     </dependencies>
                     <configuration>
                         <skip>${skipTests}</skip>
-                        <encoding>UTF-8</encoding>
+                        <inputEncoding>UTF-8</inputEncoding>
                         <configLocation>../checkstyle.xml</configLocation>
                         <failsOnError>true</failsOnError>
                         <failOnViolation>true</failOnViolation>
