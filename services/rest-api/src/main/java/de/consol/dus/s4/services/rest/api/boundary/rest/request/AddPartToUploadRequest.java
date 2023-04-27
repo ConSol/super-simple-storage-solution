@@ -1,8 +1,8 @@
 package de.consol.dus.s4.services.rest.api.boundary.rest.request;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.MediaType;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.core.MediaType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

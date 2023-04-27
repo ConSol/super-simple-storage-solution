@@ -3,8 +3,8 @@ package de.consol.dus.s4.services.aggregator.boundary.quarkus.producers;
 import de.consol.dus.s4.services.aggregator.usecases.AggregateUploadDataUseCase;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.UploadDao;
 import io.quarkus.runtime.Startup;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 

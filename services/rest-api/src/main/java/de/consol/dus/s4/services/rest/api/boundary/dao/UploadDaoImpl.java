@@ -11,11 +11,11 @@ import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.CreateNewUpl
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetStatusOfUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.requests.SetTotalPartsForUploadRequest;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.responses.Upload;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
-import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @ApplicationScoped

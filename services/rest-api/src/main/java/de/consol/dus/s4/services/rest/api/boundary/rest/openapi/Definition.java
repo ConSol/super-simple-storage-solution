@@ -7,9 +7,9 @@ import de.consol.dus.s4.services.rest.api.boundary.rest.request.SetTotalPartsOfU
 import de.consol.dus.s4.services.rest.api.boundary.rest.request.StartUploadRequest;
 import de.consol.dus.s4.services.rest.api.boundary.rest.response.UploadResponse;
 import de.consol.dus.s4.services.rest.api.usecases.api.responses.UploadStatus;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.openapi.annotations.Components;
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.enums.ParameterIn;

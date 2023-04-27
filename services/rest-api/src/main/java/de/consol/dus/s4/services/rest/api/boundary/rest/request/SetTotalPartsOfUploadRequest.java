@@ -1,6 +1,6 @@
 package de.consol.dus.s4.services.rest.api.boundary.rest.request;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;

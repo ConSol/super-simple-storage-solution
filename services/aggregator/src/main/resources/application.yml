@@ -4,10 +4,10 @@ quarkus:
     username: ${DB_USERNAME:upload}
     password: ${DB_PASSWORD:upload}
     jdbc:
-      driver: io.opentelemetry.instrumentation.jdbc.OpenTelemetryDriver
-      url: jdbc:otel:${quarkus.datasource.db-kind}://${DB_HOST:localhost:5432}/${DB_NAME:upload}
+      url: jdbc:${quarkus.datasource.db-kind}://${DB_HOST:localhost:5432}/${DB_NAME:upload}
       min-size: ${DB_MIN_SIZE:2}
       max-size: ${DB_MAX_SIZE:8}
+      telemetry: true
   devservices:
     enabled: false
   hibernate-orm:
@@ -28,12 +28,11 @@ quarkus:
         port: ${GELF_PORT:12201}
   native:
     additional-build-args: -J-Xmx4g
-  opentelemetry:
+  otel:
     enabled: true
-    tracer:
-      exporter:
-        otlp:
-          endpoint: ${OTLP_HOST:http://localhost:4317}
+    exporter:
+      otlp:
+        endpoint: ${OTLP_HOST:http://localhost:4317}
 mp:
   messaging:
     incoming:

@@ -1,7 +1,7 @@
 package de.consol.dus.s4.services.rest.api.boundary.rest.request;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Value;

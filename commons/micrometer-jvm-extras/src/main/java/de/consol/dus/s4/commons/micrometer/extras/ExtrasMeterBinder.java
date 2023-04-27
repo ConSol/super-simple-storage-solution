@@ -3,8 +3,8 @@ package de.consol.dus.s4.commons.micrometer.extras;
 import io.github.mweirauch.micrometer.jvm.extras.ProcessMemoryMetrics;
 import io.github.mweirauch.micrometer.jvm.extras.ProcessThreadMetrics;
 import io.micrometer.core.instrument.binder.MeterBinder;
-import javax.enterprise.inject.Produces;
-import javax.inject.Singleton;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class ExtrasMeterBinder {

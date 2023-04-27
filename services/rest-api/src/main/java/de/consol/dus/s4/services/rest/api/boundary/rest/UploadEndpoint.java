@@ -24,31 +24,29 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 import io.smallrye.mutiny.unchecked.Unchecked;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.nio.file.Files;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.jboss.resteasy.reactive.MultipartForm;
 import org.slf4j.MDC;
 
 @Path("uploads")
@@ -57,13 +55,11 @@ import org.slf4j.MDC;
 @RequiredArgsConstructor
 public class UploadEndpoint {
   @Operation(summary = "Gets all uploads.", operationId = "getAllUploads")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadListOk")
   @APIResponse(ref = "ise")
   @GET
-  public Uni<Response> getAllUploads(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      String correlationId) {
+  public Uni<Response> getAllUploads() {
     Span.current().setAttribute(
         RequestFilter.CORRELATION_ID_MDC_KEY,
         MDC.get(RequestFilter.CORRELATION_ID_MDC_KEY));
@@ -88,17 +84,12 @@ public class UploadEndpoint {
       description = "This is the first request to start an upload. It contains no content, and "
           + "returns an id that must be used in subsequent calls to identify the upload.",
       operationId = "startUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadOk")
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "ise")
   @POST
   public Uni<Response> startUpload(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @Valid
-      @NotBlank
-      String correlationId,
-
       @RequestBody(ref = "StartUploadRequest")
       @Valid
       @NotNull StartUploadRequest request) {
@@ -126,18 +117,13 @@ public class UploadEndpoint {
       description = "Gets information to one upload. If no upload with the given id exists, a `404`"
           + "error with a corresponding error message is returned.",
       operationId = "getUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadOk")
   @APIResponse(ref = "notFound")
   @APIResponse(ref = "ise")
   @GET
   @Path("{id}")
   public Uni<Response> getUpload(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @Valid
-      @NotBlank
-      String correlationId,
-
       @Parameter(ref = "id")
       @PathParam("id")
       long id) throws NoSuchEntityException {
@@ -200,17 +186,12 @@ public class UploadEndpoint {
           + "upload is still in progress. This endpoint should never return `404` error, even if "
           + "one tries to delete a non-existing upload.",
       operationId = "deleteUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "noContent")
   @APIResponse(ref = "ise")
   @DELETE
   @Path("{id}")
   public Uni<Response> deleteUpload(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @Valid
-      @NotBlank
-      String correlationId,
-
       @Parameter(ref = "id")
       @PathParam("id")
       long id) {
@@ -238,6 +219,7 @@ public class UploadEndpoint {
           + "a corresponding error message is returned. If no upload with the given id exists, a "
           + "`404` error with a corresponding error message is returned.",
       operationId = "setTotalPartsForUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadOk")
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "notFound")
@@ -246,12 +228,6 @@ public class UploadEndpoint {
   @PUT
   @Path(value = "{id}/totalParts")
   public Uni<Response> addTotalParts(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @Valid
-      @NotBlank
-      String correlationId,
-
       @Parameter(ref = "id")
       @PathParam("id")
       long id,
@@ -285,18 +261,13 @@ public class UploadEndpoint {
       description = "Gets a list of all part number to an upload. If no upload with the given id "
           + "exists, a `404` error with a corresponding error message is returned.",
       operationId = "getPartsOfUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadPartsListOk")
   @APIResponse(ref = "notFound")
   @APIResponse(ref = "ise")
   @GET
   @Path(value = "{id}/parts")
   public Uni<Response> getParts(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @Valid
-      @NotBlank
-      String correlationId,
-
       @Parameter(ref = "id")
       @PathParam("id")
       long id) {
@@ -330,6 +301,7 @@ public class UploadEndpoint {
           + "upload with the given id exists, a `404` error with a corresponding error message is "
           + "returned.",
       operationId = "addPartToUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadOk")
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "notFound")
@@ -338,18 +310,12 @@ public class UploadEndpoint {
   @Path(value = "{id}/parts")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   public Uni<Response> addPart(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @Valid
-      @NotBlank
-      String correlationId,
-
       @Parameter(ref = "id")
       @PathParam("id")
       long id,
 
       @RequestBody(ref = "AddPartToUploadRequest")
-      @MultipartForm
+      @BeanParam
       @Valid
       @NotNull
       AddPartToUploadRequest request) {
@@ -386,6 +352,7 @@ public class UploadEndpoint {
           + "no part with the given partNumber exists, a `404` error with a corresponding error "
           + "message is returned.",
       operationId = "getContentOfPartOfUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "downloadOk")
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "notFound")
@@ -394,12 +361,6 @@ public class UploadEndpoint {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @Path(value = "{id}/parts/{partNumber}/content")
   public Uni<Response> getPartContent(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @Valid
-      @NotBlank
-      String correlationId,
-
       @Parameter(ref = "id")
       @PathParam("id")
       long id,
@@ -452,6 +413,7 @@ public class UploadEndpoint {
           + "upload with the given id exists, a `404` error with a corresponding error message is "
           + "returned.",
       operationId = "getContentOfUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "downloadOk")
   @APIResponse(ref = "noContent")
   @APIResponse(ref = "notFound")
@@ -460,12 +422,6 @@ public class UploadEndpoint {
   @Produces({MediaType.APPLICATION_OCTET_STREAM})
   @Path("{id}/content")
   public Uni<Response> getUploadContent(
-      @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @HeaderParam(RequestFilter.CORRELATION_ID_HEADER_KEY)
-      @Valid
-      @NotBlank
-      String correlationId,
-
       @Parameter(ref = "id")
       @PathParam("id")
       long id) {

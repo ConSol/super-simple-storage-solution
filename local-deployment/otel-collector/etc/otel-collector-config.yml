@@ -7,12 +7,31 @@ receivers:
     protocols:
       grpc:
         endpoint: otel-collector:55680
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'prometheus'
+          static_configs:
+            - targets: ['localhost:9090']
+
+        - job_name: 'quarkus'
+          scrape_interval: 2s
+          metrics_path: '/q/metrics'
+
+          static_configs:
+            - targets: ['rest-api:8080', 'aggregator:8081']
 
 exporters:
   jaeger:
     endpoint: jaeger:14250
     tls:
       insecure: true
+  prometheus:
+    endpoint: '0.0.0.0:9999'
+    send_timestamps: true
+    metric_expiration: 180m
+    resource_to_telemetry_conversion:
+      enabled: true
 
 processors:
   batch:
@@ -27,3 +46,7 @@ service:
       receivers: [otlp,otlp/2]
       processors: [batch]
       exporters: [jaeger]
+    metrics:
+      receivers: [prometheus]
+      processors: [batch]
+      exporters: [prometheus]

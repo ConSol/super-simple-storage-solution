@@ -1,6 +1,6 @@
 package de.consol.dus.s4.commons.http.exceptions;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 public class NoSuchEntityException extends HttpStatusException {
   public NoSuchEntityException(Class<?> clazz, long id) {

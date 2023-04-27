@@ -7,8 +7,8 @@ import de.consol.dus.s4.services.aggregator.boundary.messaging.amqp.requests.Agg
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.reactive.messaging.annotations.Blocking;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.concurrent.CompletionStage;
-import javax.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;

@@ -2,9 +2,9 @@ package de.consol.dus.s4.commons.correlation.http.exceptions.filter.container;
 
 import io.quarkus.vertx.web.RouteFilter;
 import io.vertx.ext.web.RoutingContext;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Optional;
 import java.util.UUID;
-import javax.enterprise.context.ApplicationScoped;
 import org.slf4j.MDC;
 
 @ApplicationScoped

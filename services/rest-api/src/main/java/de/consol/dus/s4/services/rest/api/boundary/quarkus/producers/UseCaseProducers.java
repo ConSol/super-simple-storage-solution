@@ -10,8 +10,8 @@ import de.consol.dus.s4.services.rest.api.usecases.SetTotalPartsUseCase;
 import de.consol.dus.s4.services.rest.api.usecases.spi.dao.UploadDao;
 import de.consol.dus.s4.services.rest.api.usecases.spi.messaging.UploadReadyForProcessingEmitter;
 import io.quarkus.runtime.Startup;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class UseCaseProducers {
   @Produces
   public DeleteUploadByIdUseCase deleteUploadUseCase() {
     return DeleteUploadByIdUseCase
-            .getInstance(uploadDao, getLoggerForClass(DeleteUploadByIdUseCase.class));
+        .getInstance(uploadDao, getLoggerForClass(DeleteUploadByIdUseCase.class));
   }
 
 

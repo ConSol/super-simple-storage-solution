@@ -128,7 +128,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "process_memory_rss_bytes{instance=\"${deployment}\"}",
+          "expr": "process_memory_rss_bytes{exported_instance=\"${deployment}\"}",
           "legendFormat": "RSS Memory",
           "range": true,
           "refId": "A"
@@ -223,7 +223,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": false,
-          "expr": "jvm_memory_used_bytes{instance=\"${deployment}\"}",
+          "expr": "jvm_memory_used_bytes{exported_instance=\"${deployment}\"}",
           "interval": "",
           "legendFormat": "{{id}}",
           "refId": "Memory Usage"
@@ -319,7 +319,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "process_cpu_usage{instance=\"${deployment}\"}",
+          "expr": "process_cpu_usage{exported_instance=\"${deployment}\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "CPU Load"
@@ -415,7 +415,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "jvm_threads_live_threads{instance=\"${deployment}\"}",
+          "expr": "jvm_threads_live_threads{exported_instance=\"${deployment}\"}",
           "interval": "",
           "legendFormat": "live threads",
           "refId": "Live Threads"
@@ -426,7 +426,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "jvm_threads_daemon_threads{instance=\"${deployment}\"}",
+          "expr": "jvm_threads_daemon_threads{exported_instance=\"${deployment}\"}",
           "hide": false,
           "interval": "",
           "legendFormat": "daemon threads",

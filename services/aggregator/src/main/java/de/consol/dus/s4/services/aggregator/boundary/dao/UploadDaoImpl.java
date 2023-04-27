@@ -6,9 +6,9 @@ import de.consol.dus.s4.services.aggregator.usecases.spi.dao.UploadDao;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.requests.WriteContentAndReleasePartsRequest;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.Upload;
 import de.consol.dus.s4.services.aggregator.usecases.spi.dao.responses.UploadStatus;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
-import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 

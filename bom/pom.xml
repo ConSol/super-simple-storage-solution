@@ -14,7 +14,6 @@
 
     <properties>
         <!-- Plugins -->
-        <antrun-plugin.version>3.1.0</antrun-plugin.version>
         <checkstyle-version>10.9.3</checkstyle-version>
         <checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
@@ -23,11 +22,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus.platform.version>2.16.6.Final</quarkus.platform.version>
+        <quarkus.platform.version>3.0.1.Final</quarkus.platform.version>
 
         <!-- Dependencies -->
         <archunit.version>1.0.1</archunit.version>
-        <citrus.version>3.2.1</citrus.version>
+        <citrus.version>3.4.0</citrus.version>
         <citrus-log4j.version>2.19.0</citrus-log4j.version>
         <citrus-spring-test.version>5.3.15</citrus-spring-test.version>
         <org.projectlombok.version>1.18.26</org.projectlombok.version>
@@ -117,25 +116,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${surefire-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>${antrun-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>create-emptydir</id>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <phase>package</phase>
-                            <configuration>
-                                <target>
-                                    <mkdir dir="${project.build.directory}/emptydir"/>
-                                </target>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.flywaydb</groupId>

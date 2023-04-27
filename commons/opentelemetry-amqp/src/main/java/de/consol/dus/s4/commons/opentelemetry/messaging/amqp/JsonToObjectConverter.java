@@ -3,9 +3,9 @@ package de.consol.dus.s4.commons.opentelemetry.messaging.amqp;
 import io.smallrye.reactive.messaging.MessageConverter;
 import io.smallrye.reactive.messaging.amqp.IncomingAmqpMetadata;
 import io.vertx.core.json.JsonObject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.MediaType;
 import java.lang.reflect.Type;
-import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.core.MediaType;
 import org.eclipse.microprofile.reactive.messaging.Message;
 
 @ApplicationScoped
