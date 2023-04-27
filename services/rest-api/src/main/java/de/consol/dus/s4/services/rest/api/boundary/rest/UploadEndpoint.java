@@ -55,6 +55,7 @@ import org.slf4j.MDC;
 @RequiredArgsConstructor
 public class UploadEndpoint {
   @Operation(summary = "Gets all uploads.", operationId = "getAllUploads")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadListOk")
   @APIResponse(ref = "ise")
   @GET
@@ -83,6 +84,7 @@ public class UploadEndpoint {
       description = "This is the first request to start an upload. It contains no content, and "
           + "returns an id that must be used in subsequent calls to identify the upload.",
       operationId = "startUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadOk")
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "ise")
@@ -115,6 +117,7 @@ public class UploadEndpoint {
       description = "Gets information to one upload. If no upload with the given id exists, a `404`"
           + "error with a corresponding error message is returned.",
       operationId = "getUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadOk")
   @APIResponse(ref = "notFound")
   @APIResponse(ref = "ise")
@@ -183,6 +186,7 @@ public class UploadEndpoint {
           + "upload is still in progress. This endpoint should never return `404` error, even if "
           + "one tries to delete a non-existing upload.",
       operationId = "deleteUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "noContent")
   @APIResponse(ref = "ise")
   @DELETE
@@ -215,6 +219,7 @@ public class UploadEndpoint {
           + "a corresponding error message is returned. If no upload with the given id exists, a "
           + "`404` error with a corresponding error message is returned.",
       operationId = "setTotalPartsForUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadOk")
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "notFound")
@@ -256,6 +261,7 @@ public class UploadEndpoint {
       description = "Gets a list of all part number to an upload. If no upload with the given id "
           + "exists, a `404` error with a corresponding error message is returned.",
       operationId = "getPartsOfUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadPartsListOk")
   @APIResponse(ref = "notFound")
   @APIResponse(ref = "ise")
@@ -295,6 +301,7 @@ public class UploadEndpoint {
           + "upload with the given id exists, a `404` error with a corresponding error message is "
           + "returned.",
       operationId = "addPartToUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "uploadOk")
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "notFound")
@@ -345,6 +352,7 @@ public class UploadEndpoint {
           + "no part with the given partNumber exists, a `404` error with a corresponding error "
           + "message is returned.",
       operationId = "getContentOfPartOfUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "downloadOk")
   @APIResponse(ref = "badRequest")
   @APIResponse(ref = "notFound")
@@ -405,6 +413,7 @@ public class UploadEndpoint {
           + "upload with the given id exists, a `404` error with a corresponding error message is "
           + "returned.",
       operationId = "getContentOfUpload")
+  @Parameter(ref = RequestFilter.CORRELATION_ID_HEADER_KEY)
   @APIResponse(ref = "downloadOk")
   @APIResponse(ref = "noContent")
   @APIResponse(ref = "notFound")
