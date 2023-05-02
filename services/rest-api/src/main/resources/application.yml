@@ -1,4 +1,6 @@
 quarkus:
+  application:
+    name: rest-api
   datasource:
     db-kind: postgresql
     username: ${DB_USERNAME:upload}
@@ -14,7 +16,7 @@ quarkus:
     dialect: org.hibernate.dialect.PostgreSQLDialect
   log:
     console:
-      format: '%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X] (%t) %s%e%n'
+      format: "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{3.}] [%X] (%t) %s%e%n"
       json:
         ~: ${CONSOLE_LOG_JSON:false}
         exception-output-type: formatted
