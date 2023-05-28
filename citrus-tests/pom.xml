@@ -24,6 +24,7 @@
         <citrus.skip.build.uber-jar>false</citrus.skip.build.uber-jar>
         <citrus.skip.surefire.tests>true</citrus.skip.surefire.tests>
         <citrus.skip.remote.tests>true</citrus.skip.remote.tests>
+        <citrus-slf4j-api.version>1.7.36</citrus-slf4j-api.version>
     </properties>
 
     <build>
@@ -98,6 +99,11 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-layout-template-json</artifactId>
             <version>${citrus-log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${citrus-slf4j-api.version}</version>
         </dependency>
         <!-- Actual Citrus -->
         <dependency>
