@@ -22,7 +22,6 @@ import org.eclipse.microprofile.openapi.annotations.media.SchemaProperty;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 @OpenAPIDefinition(
     info = @Info(
@@ -45,15 +44,15 @@ import org.jboss.resteasy.reactive.multipart.FileUpload;
         schemas = {
             @Schema(
                 name = "uploadId",
-                title = "the id uniquely identifying an upload",
-                description = "the id uniquely identifying an upload",
+                title = "The id uniquely identifying an upload",
+                description = "The id uniquely identifying an upload",
                 type = SchemaType.INTEGER,
                 format = "int64",
                 required = true),
             @Schema(
                 name = "partNumber",
-                title = "the number of an upload part",
-                description = "the number of an upload part",
+                title = "The number of an upload part",
+                description = "The number of an upload part",
                 type = SchemaType.INTEGER,
                 format = "int32",
                 required = true,
@@ -77,7 +76,7 @@ import org.jboss.resteasy.reactive.multipart.FileUpload;
                     """),
             @Schema(
                 name = "AddPartToUploadRequest",
-                title = "Adds a part to an upload",
+                title = "Add a part to an upload",
                 description = "This schema is sent to add a part with the given `partNumber` and "
                     + "content to a previously started upload",
                 required = true,
@@ -88,12 +87,12 @@ import org.jboss.resteasy.reactive.multipart.FileUpload;
                 requiredProperties = {"partNumber", "content"}),
             @Schema(
                 name = "SetTotalPartsOfUploadRequest",
-                title = "Set `totalParts` of an upload",
+                title = "Set total parts of an upload",
                 description = "The schema is sent to set the `totalParts` of an upload.",
                 implementation = SetTotalPartsOfUploadRequest.class),
             @Schema(
                 name = "UploadResponse",
-                title = "Upload response schema",
+                title = "Response to a successful request",
                 description = "This schema describes the return value for all requests that "
                     + "directly deal with uploads (not parts, though).",
                 implementation = UploadResponse.class,
@@ -108,18 +107,14 @@ import org.jboss.resteasy.reactive.multipart.FileUpload;
                     """),
             @Schema(
                 name = "UploadStatus",
-                title = "Status of the upload",
+                title = "The status of an upload",
+                description = "The status of an upload",
                 implementation = UploadStatus.class),
             @Schema(
                 name = "ErrorResponse",
-                title = "Error Response Schema",
+                title = "Response given when an error occurs",
                 description = "This schema is for general error responses.",
-                implementation = ErrorResponse.class),
-            @Schema(
-                name = "FileUpload",
-                title = "Binary Data for a part upload",
-                description = "This schema represents the binary data of a part upload.",
-                implementation = FileUpload.class)},
+                implementation = ErrorResponse.class)},
         parameters = {
             @Parameter(
                 name = "id",
