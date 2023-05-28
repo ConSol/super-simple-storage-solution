@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 services:
   # SERVICES
   deployment-rest-api:
@@ -14,8 +14,8 @@ services:
           memory: 256M
     env_file: services/rest-api/.env
     ports:
-      - '8080:8080'
-      - '5005:5005'
+      - "8080:8080"
+      - "5005:5005"
     depends_on:
       - postgres
       - artemis
@@ -34,8 +34,8 @@ services:
           memory: 256M
     env_file: services/aggregator/.env
     ports:
-      - '8081:8081'
-      - '5006:5005'
+      - "8081:8081"
+      - "5006:5005"
     depends_on:
       - postgres
       - artemis
@@ -52,8 +52,8 @@ services:
       dockerfile: ../../dockerfiles/Dockerfile.quarkus-distroless
     env_file: services/rest-api/.dev.env
     ports:
-      - '8080:8080'
-      - '5005:5005'
+      - "8080:8080"
+      - "5005:5005"
     depends_on:
       - postgres
       - artemis
@@ -68,8 +68,8 @@ services:
       dockerfile: ../../dockerfiles/Dockerfile.quarkus-distroless
     env_file: services/aggregator/.dev.env
     ports:
-      - '8081:8080'
-      - '5006:5005'
+      - "8081:8080"
+      - "5006:5005"
     depends_on:
       - postgres
       - artemis
@@ -93,7 +93,7 @@ services:
       - -XX:MaximumHeapSizePercent=10
       - -XX:MaximumYoungGenerationSizePercent=5
     ports:
-      - '8080:8080'
+      - "8080:8080"
     depends_on:
       - postgres
       - artemis
@@ -115,8 +115,8 @@ services:
       - -XX:MaximumHeapSizePercent=10
       - -XX:MaximumYoungGenerationSizePercent=5
     ports:
-      - '8081:8080'
-      - '5006:5005'
+      - "8081:8080"
+      - "5006:5005"
     depends_on:
       - postgres
       - artemis
@@ -224,12 +224,21 @@ services:
     networks:
       - observability
 
-  # prometheus & grana
+  # prometheus, tempo & grafana
   prometheus:
     container_name: prometheus
     image: docker.io/prom/prometheus:v2.43.0
     volumes:
       - ${REMOTE_PROJECT_PATH:-.}/prometheus/etc/prometheus:/etc/prometheus:ro
+    networks:
+      - observability
+
+  tempo:
+    container_name: tempo
+    image: docker.io/grafana/tempo:2.1.1
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ${REMOTE_PROJECT_PATH:-.}/tempo/etc/tempo.yml:/etc/tempo.yml:ro
     networks:
       - observability
 
@@ -246,6 +255,7 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+      - tempo
     networks:
       - observability
 
@@ -261,6 +271,7 @@ services:
       ES_JAVA_OPTS: -Xms512m -Xmx512m
     networks:
       - logging
+      - observability
   logstash:
     container_name: logstash
     image: docker.elastic.co/logstash/logstash-oss:${ELK_VERSION}
@@ -300,7 +311,7 @@ services:
         target: /var/lib/docker
         type: bind
         read_only: true
-      - source: /var/run/docker.sock
+      - source: ${DOCKER_SOCK_PATH:-/var/run/docker.sock}
         target: /var/run/docker.sock
         type: bind
     command: [ "-e", "-strict.perms=false" ]
