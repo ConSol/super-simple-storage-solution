@@ -27,7 +27,7 @@
         <!-- Dependencies -->
         <archunit.version>1.0.1</archunit.version>
         <citrus.version>3.4.0</citrus.version>
-        <citrus-log4j.version>2.19.0</citrus-log4j.version>
+        <citrus-log4j.version>2.20.0</citrus-log4j.version>
         <citrus-spring-test.version>5.3.15</citrus-spring-test.version>
         <org.projectlombok.version>1.18.26</org.projectlombok.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
