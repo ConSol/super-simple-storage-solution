@@ -307,8 +307,8 @@ services:
         target: /usr/share/filebeat/filebeat.yml
         type: bind
         read_only: true
-      - source: /var/lib/docker
-        target: /var/lib/docker
+      - source: ${CONTAINERS_DIR:-/var/lib/containers}
+        target: /var/lib/containers
         type: bind
         read_only: true
       - source: ${DOCKER_SOCK_PATH:-/var/run/docker.sock}
