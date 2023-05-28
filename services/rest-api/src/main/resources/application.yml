@@ -74,6 +74,8 @@ mp:
         username: ${AMQP_USERNAME:artemis}
         password: ${AMQP_PASSWORD:artemis}
         use-anonymous-sender: false
+  openapi:
+    filter: de.consol.dus.s4.services.rest.api.boundary.rest.openapi.CorrelationIdOasFilter
 "%dev":
    quarkus:
      flyway:
