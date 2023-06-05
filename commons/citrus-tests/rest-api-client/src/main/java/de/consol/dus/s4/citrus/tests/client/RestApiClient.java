@@ -40,6 +40,9 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 
 public class RestApiClient {
+  public static final String CORRELATION_ID_SUFFIX = "-correlationId";
+  public static final String UPLOAD_ID_SUFFIX = "-uploadId";
+  public static final String CORRELATION_ID_HTTP_HEADER = "X-Correlation-ID";
   private final HttpClient httpClient;
 
   @Bean
@@ -75,15 +78,15 @@ public class RestApiClient {
     // @formatter:on
 
     final UUID internalOperationId = UUID.randomUUID();
-    final String correlationIdVariableName = internalOperationId + "-correlationId";
-    final String uploadIdVariableName = internalOperationId + "-uploadId";
+    final String correlationIdVariableName = internalOperationId + CORRELATION_ID_SUFFIX;
+    final String uploadIdVariableName = internalOperationId + UPLOAD_ID_SUFFIX;
     // @formatter:off
     runner.$(http()
         .client(httpClient)
         .receive()
             .response(HttpStatus.OK)
             .message()
-                .header("X-Correlation-ID")
+                .header(CORRELATION_ID_HTTP_HEADER)
                 .type(MediaType.APPLICATION_JSON_VALUE)
                 .validate(jsonPath()
                     .expression("$.id", "@isNumber()@")
@@ -92,7 +95,7 @@ public class RestApiClient {
                     .expression("$.status", "UPLOAD_IN_PROGRESS")
                     .expression("$.totalParts", null))
                 .extract(fromHeaders()
-                    .expression("X-Correlation-ID", correlationIdVariableName))
+                    .expression(CORRELATION_ID_HTTP_HEADER, correlationIdVariableName))
                 .extract(fromBody().expression("$.id", uploadIdVariableName)));
     // @formatter:on
 
@@ -105,7 +108,7 @@ public class RestApiClient {
       Map<String, Object> map,
       String correlationId) {
     if (Objects.nonNull(correlationId)) {
-      map.put("X-Correlation-ID", correlationId);
+      map.put(CORRELATION_ID_HTTP_HEADER, correlationId);
     }
     return map;
   }
@@ -160,8 +163,8 @@ public class RestApiClient {
     // @formatter:on
 
     final UUID internalOperationId = UUID.randomUUID();
-    final String correlationIdVariableName = internalOperationId + "-correlationId";
-    final String uploadIdVariableName = internalOperationId + "-uploadId";
+    final String correlationIdVariableName = internalOperationId + CORRELATION_ID_SUFFIX;
+    final String uploadIdVariableName = internalOperationId + UPLOAD_ID_SUFFIX;
     // @formatter:off
     runner.$(http().client(httpClient)
         .receive()
@@ -201,8 +204,8 @@ public class RestApiClient {
     // @formatter:on
 
     final UUID internalOperationId = UUID.randomUUID();
-    final String correlationIdVariableName = internalOperationId + "-correlationId";
-    final String uploadIdVariableName = internalOperationId + "-uploadId";
+    final String correlationIdVariableName = internalOperationId + CORRELATION_ID_SUFFIX;
+    final String uploadIdVariableName = internalOperationId + UPLOAD_ID_SUFFIX;
     // @formatter:off
     runner.$(http().client(httpClient)
         .receive()
@@ -237,7 +240,7 @@ public class RestApiClient {
     final UUID internalOperationId = UUID.randomUUID();
     final String contentDispositionVariableName =
         internalOperationId + HttpHeaders.CONTENT_DISPOSITION;
-    final String correlationIdVariableName = internalOperationId + "-correlationId";
+    final String correlationIdVariableName = internalOperationId + CORRELATION_ID_SUFFIX;
     // @formatter:off
     runner.$(http().client(httpClient)
         .receive()
@@ -308,7 +311,7 @@ public class RestApiClient {
     // @formatter:on
 
     final UUID internalOperationId = UUID.randomUUID();
-    final String correlationIdVariableName = internalOperationId + "-correlationId";
+    final String correlationIdVariableName = internalOperationId + CORRELATION_ID_SUFFIX;
     // @formatter:off
     runner.$(http()
         .client(httpClient)
