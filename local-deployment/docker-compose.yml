@@ -83,7 +83,7 @@ services:
       - native-services
     build:
       context: ../services/rest-api
-      dockerfile: ../../dockerfiles/Dockerfile.native
+      dockerfile: ../../dockerfiles/Dockerfile.native-distroless
     deploy:
       resources:
         limits:
@@ -105,7 +105,7 @@ services:
       - native-services
     build:
       context: ../services/aggregator
-      dockerfile: ../../dockerfiles/Dockerfile.native
+      dockerfile: ../../dockerfiles/Dockerfile.native-distroless
     deploy:
       resources:
         limits:

@@ -5,7 +5,10 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en"
 USER 185
 WORKDIR /deployment
 
-COPY --chown=185 target/*.jar /deployment/app.jar
+COPY \
+  --chown=185 \
+  --chmod=555 \
+  target/*.jar /deployment/app.jar
 
 ENTRYPOINT [ "java", "-jar", "app.jar" ]
 

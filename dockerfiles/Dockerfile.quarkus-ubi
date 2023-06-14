@@ -5,9 +5,21 @@ ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en"
 USER 185
 WORKDIR /deployment
 
-COPY --chown=185 target/quarkus-app/lib/ /deployment/lib/
-COPY --chown=185 target/quarkus-app/*.jar /deployment/
-COPY --chown=185 target/quarkus-app/app/ /deployment/app/
-COPY --chown=185 target/quarkus-app/quarkus/ /deployment/quarkus/
+COPY \
+  --chown=185 \
+  --chmod=555 \
+  target/quarkus-app/lib/ /deployment/lib/
+COPY \
+  --chown=185 \
+  --chmod=555 \
+  target/quarkus-app/*.jar /deployment/
+COPY \
+  --chown=185 \
+  --chmod=555 \
+  target/quarkus-app/app/ /deployment/app/
+COPY \
+  --chown=185 \
+  --chmod=555 \
+  target/quarkus-app/quarkus/ /deployment/quarkus/
 
 ENTRYPOINT [ "java", "-jar", "quarkus-run.jar" ]

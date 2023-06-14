@@ -1,0 +1,12 @@
+# 2.0
+FROM quay.io/quarkus/quarkus-micro-image@sha256:f3c1cca112c62d6ce5fa17c1fed56033981b7ecf9a19ca1d4b577ae864c0c693
+
+USER 185
+WORKDIR /deployment
+
+COPY \
+  --chown=185 \
+  --chmod=111 \
+  target/*-runner /deployment/quarkus-run
+
+ENTRYPOINT ["./quarkus-run"]

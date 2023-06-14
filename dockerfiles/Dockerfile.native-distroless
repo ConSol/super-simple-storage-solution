@@ -1,0 +1,12 @@
+# 2.0
+FROM quay.io/quarkus/quarkus-distroless-image@sha256:6b8bdd0419b4aad072ea93514bbc883213e67a87f827721f84ccf3bd692247a1
+
+USER 185
+WORKDIR /deployment
+
+COPY \
+  --chown=185 \
+  --chmod=111 \
+  target/*-runner /deployment/quarkus-run
+
+ENTRYPOINT ["./quarkus-run"]
