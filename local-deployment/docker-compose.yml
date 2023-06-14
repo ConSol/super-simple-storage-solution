@@ -2,7 +2,7 @@ version: "3.7"
 services:
   # SERVICES
   deployment-rest-api:
-    container_name: rest-api
+    container_name: s4-rest-api
     profiles:
       - services
     build:
@@ -22,7 +22,7 @@ services:
     networks:
       - default
   deployment-aggregator:
-    container_name: aggregator
+    container_name: s4-aggregator
     profiles:
       - services
     build:
@@ -44,7 +44,7 @@ services:
 
   # DEBUG SERVICES - WITH REMOTE DEV CAPABILITIES
   debug-rest-api:
-    container_name: rest-api
+    container_name: s4-rest-api
     profiles:
       - debug-services
     build:
@@ -60,7 +60,7 @@ services:
     networks:
       - default
   debug-aggregator:
-    container_name: aggregator
+    container_name: s4-aggregator
     profiles:
       - debug-services
     build:
@@ -78,7 +78,7 @@ services:
 
   # NATIVE SERVICES
   native-rest-api:
-    container_name: rest-api
+    container_name: s4-rest-api
     profiles:
       - native-services
     build:
@@ -100,7 +100,7 @@ services:
     networks:
       - default
   native-aggregator:
-    container_name: aggregator
+    container_name: s4-aggregator
     profiles:
       - native-services
     build:
@@ -125,7 +125,7 @@ services:
 
   # TESTS
   citrus-continuous:
-    container_name: citrus-continuous
+    container_name: s4-citrus-continuous
     profiles:
       - tests
     build:
@@ -150,7 +150,7 @@ services:
 
   # postgres + pgadmin4 web UI
   postgres:
-    container_name: postgres
+    container_name: s4-postgres
     # 14.3
     image: docker.io/postgres:15.2-alpine3.17
     volumes:
@@ -166,7 +166,7 @@ services:
       - default
       - database
   pgadmin4:
-    container_name: pgadmin4
+    container_name: s4-pgadmin4
     # 6.9
     image: docker.io/dpage/pgadmin4:7.0
     volumes:
@@ -183,6 +183,7 @@ services:
 
   # apache activemq-artemis
   artemis:
+    container_name: s4-artemis
     image: quay.io/artemiscloud/activemq-artemis-broker-kubernetes:1.0.17
     ports:
       - "8161:8161"
@@ -197,7 +198,7 @@ services:
       - default
 
   otel-collector:
-    container_name: otel-collector
+    container_name: s4-otel-collector
     image: docker.io/otel/opentelemetry-collector:0.75.0
     command: [ "--config=/etc/otel-collector-config.yml" ]
     volumes:
@@ -215,7 +216,7 @@ services:
 
   # jaeger & otel collector
   jaeger:
-    container_name: jaeger
+    container_name: s4-jaeger
     image: docker.io/jaegertracing/all-in-one:1.44.0
     ports:
       - "14268:14268"
@@ -226,7 +227,7 @@ services:
 
   # prometheus, tempo & grafana
   prometheus:
-    container_name: prometheus
+    container_name: s4-prometheus
     image: docker.io/prom/prometheus:v2.43.0
     volumes:
       - ${REMOTE_PROJECT_PATH:-.}/prometheus/etc/prometheus:/etc/prometheus:ro
@@ -234,7 +235,7 @@ services:
       - observability
 
   tempo:
-    container_name: tempo
+    container_name: s4-tempo
     image: docker.io/grafana/tempo:2.1.1
     command: [ "-config.file=/etc/tempo.yml" ]
     volumes:
@@ -243,7 +244,7 @@ services:
       - observability
 
   grafana:
-    container_name: grafana
+    container_name: s4-grafana
     image: docker.io/grafana/grafana:9.5.1
     volumes:
       - ${REMOTE_PROJECT_PATH:-.}/grafana/etc/grafana/provisioning:/etc/grafana/provisioning:ro
@@ -261,7 +262,7 @@ services:
 
   # ELK-stack
   elasticsearch:
-    container_name: elasticsearch
+    container_name: s4-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:${ELK_VERSION}
     ports:
       - "9200:9200"
@@ -273,7 +274,7 @@ services:
       - logging
       - observability
   logstash:
-    container_name: logstash
+    container_name: s4-logstash
     image: docker.elastic.co/logstash/logstash-oss:${ELK_VERSION}
     volumes:
       - source: ${REMOTE_PROJECT_PATH:-.}/logstash/usr/share/logstash/pipeline
@@ -290,7 +291,7 @@ services:
     networks:
       - logging
   kibana:
-    container_name: kibana
+    container_name: s4-kibana
     image: docker.elastic.co/kibana/kibana-oss:${ELK_VERSION}
     depends_on:
       - elasticsearch
@@ -299,7 +300,7 @@ services:
     networks:
       - logging
   filebeat:
-    container_name: filebeat
+    container_name: s4-filebeat
     image: docker.elastic.co/beats/filebeat-oss:${ELK_VERSION}
     user: root
     volumes:
