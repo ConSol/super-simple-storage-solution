@@ -31,7 +31,7 @@
         <citrus-spring-test.version>5.3.27</citrus-spring-test.version>
         <org.projectlombok.version>1.18.28</org.projectlombok.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
-        <truth.version>1.1.3</truth.version>
+        <truth.version>1.1.4</truth.version>
 
         <!-- Project setup -->
         <failsafe.useModulePath>false</failsafe.useModulePath>
