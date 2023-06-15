@@ -9,3 +9,5 @@ updates:
     ignore:
       - dependency-name: "org.slf4j:slf4j-api"
         versions: ["[2.0,)"]
+      - dependency-name: "org.springframework:spring-test"
+        versions: ["[6.0,)"]
