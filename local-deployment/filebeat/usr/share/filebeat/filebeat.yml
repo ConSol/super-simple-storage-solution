@@ -7,6 +7,7 @@ filebeat.inputs:
 processors:
   - add_docker_metadata:
       host: "unix:///var/run/docker.sock"
+      match_source_index: 3
   - decode_json_fields:
       fields: ["message"]
       target: "json"
