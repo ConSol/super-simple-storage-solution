@@ -87,7 +87,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 48M
     env_file: services/rest-api/.env
     command:
       - -XX:MaximumHeapSizePercent=10
@@ -109,7 +109,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 48M
     env_file: services/aggregator/.env
     command:
       - -XX:MaximumHeapSizePercent=10
