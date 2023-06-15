@@ -12,4 +12,4 @@ scrape_configs:
     metrics_path: '/metrics'
 
     static_configs:
-      - targets: ['otel-collector:9999']
+      - targets: ['s4-otel-collector:9999']

@@ -447,7 +447,7 @@
         "current": {
           "selected": true,
           "text": "rest-api",
-          "value": "rest-api:8080"
+          "value": "s4-rest-api:8080"
         },
         "hide": 0,
         "includeAll": false,
@@ -457,12 +457,12 @@
           {
             "selected": true,
             "text": "rest-api",
-            "value": "rest-api:8080"
+            "value": "s4-rest-api:8080"
           },
           {
             "selected": false,
             "text": "aggregator",
-            "value": "aggregator:8081"
+            "value": "s4-aggregator:8080"
           }
         ],
         "query": "rest-api, aggregator",

@@ -13,7 +13,7 @@ processors:
       overwrite_keys: true
 
 output.logstash:
-  hosts: ["logstash:5044"]
+  hosts: ["s4-logstash:5044"]
   indices:
     - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
