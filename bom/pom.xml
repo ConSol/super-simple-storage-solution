@@ -18,7 +18,7 @@
         <checkstyle-plugin.version>3.3.0</checkstyle-plugin.version>
         <compiler-plugin.version>3.11.0</compiler-plugin.version>
         <flyway-plugin.version>9.19.4</flyway-plugin.version>
-        <jandex-maven-plugin.version>3.1.1</jandex-maven-plugin.version>
+        <jandex-maven-plugin.version>3.1.2</jandex-maven-plugin.version>
         <surefire-plugin.version>3.1.2</surefire-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
