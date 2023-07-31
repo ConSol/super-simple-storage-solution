@@ -14,7 +14,7 @@
 
     <properties>
         <!-- Plugins -->
-        <checkstyle-version>10.12.0</checkstyle-version>
+        <checkstyle-version>10.12.2</checkstyle-version>
         <checkstyle-plugin.version>3.3.0</checkstyle-plugin.version>
         <compiler-plugin.version>3.11.0</compiler-plugin.version>
         <flyway-plugin.version>9.19.4</flyway-plugin.version>
