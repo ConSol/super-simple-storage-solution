@@ -19,8 +19,6 @@ services:
     depends_on:
       - postgres
       - artemis
-    networks:
-      - default
   deployment-aggregator:
     container_name: s4-aggregator
     profiles:
@@ -39,8 +37,6 @@ services:
     depends_on:
       - postgres
       - artemis
-    networks:
-      - default
 
   # DEBUG SERVICES - WITH REMOTE DEV CAPABILITIES
   debug-rest-api:
@@ -57,8 +53,6 @@ services:
     depends_on:
       - postgres
       - artemis
-    networks:
-      - default
   debug-aggregator:
     container_name: s4-aggregator
     profiles:
@@ -73,8 +67,6 @@ services:
     depends_on:
       - postgres
       - artemis
-    networks:
-      - default
 
   # NATIVE SERVICES
   native-rest-api:
@@ -97,8 +89,6 @@ services:
     depends_on:
       - postgres
       - artemis
-    networks:
-      - default
   native-aggregator:
     container_name: s4-aggregator
     profiles:
@@ -120,8 +110,6 @@ services:
     depends_on:
       - postgres
       - artemis
-    networks:
-      - default
 
   # TESTS
   citrus-continuous:
@@ -145,8 +133,6 @@ services:
       - "2147483647"
     ports:
       - "4567:4567"
-    networks:
-      - default
 
   # postgres + pgadmin4 web UI
   postgres:
@@ -162,9 +148,6 @@ services:
       POSTGRES_MULTIPLE_DATABASES: upload
     ports:
       - "5432:5432"
-    networks:
-      - default
-      - database
   pgadmin4:
     container_name: s4-pgadmin4
     # 6.9
@@ -178,8 +161,6 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: pgadmin4
-    networks:
-      - database
 
   # apache activemq-artemis
   artemis:
@@ -194,8 +175,6 @@ services:
       AMQ_PASSWORD: matter
       AMQ_ADDRESSES: upload-ready-for-processing
       AMQ_EXTRA_ARGS: --relax-jolokia
-    networks:
-      - default
 
   otel-collector:
     container_name: s4-otel-collector
@@ -210,9 +189,6 @@ services:
       - "9999:9999"   # Metrics
     depends_on:
       - jaeger
-    networks:
-      - default
-      - observability
 
   # jaeger & otel collector
   jaeger:
@@ -222,8 +198,6 @@ services:
       - "14268:14268"
       - "14250:14250"
       - "16686:16686"
-    networks:
-      - observability
 
   # prometheus, tempo & grafana
   prometheus:
@@ -231,8 +205,6 @@ services:
     image: docker.io/prom/prometheus:v2.43.0
     volumes:
       - ${REMOTE_PROJECT_PATH:-.}/prometheus/etc/prometheus:/etc/prometheus:ro
-    networks:
-      - observability
 
   tempo:
     container_name: s4-tempo
@@ -240,8 +212,6 @@ services:
     command: [ "-config.file=/etc/tempo.yml" ]
     volumes:
       - ${REMOTE_PROJECT_PATH:-.}/tempo/etc/tempo.yml:/etc/tempo.yml:ro
-    networks:
-      - observability
 
   grafana:
     container_name: s4-grafana
@@ -257,8 +227,6 @@ services:
     depends_on:
       - prometheus
       - tempo
-    networks:
-      - observability
 
   # ELK-stack
   elasticsearch:
@@ -270,9 +238,6 @@ services:
     environment:
       discovery.type: single-node
       ES_JAVA_OPTS: -Xms512m -Xmx512m
-    networks:
-      - logging
-      - observability
   logstash:
     container_name: s4-logstash
     image: docker.elastic.co/logstash/logstash-oss:${ELK_VERSION}
@@ -288,8 +253,6 @@ services:
       - "5000:5000"
       - "5044:5044"
       - "9600:9600"
-    networks:
-      - logging
   kibana:
     container_name: s4-kibana
     image: docker.elastic.co/kibana/kibana-oss:${ELK_VERSION}
@@ -297,8 +260,6 @@ services:
       - elasticsearch
     ports:
       - "5601:5601"
-    networks:
-      - logging
   filebeat:
     container_name: s4-filebeat
     image: docker.elastic.co/beats/filebeat-oss:${ELK_VERSION}
@@ -316,14 +277,5 @@ services:
         target: /var/run/docker.sock
         type: bind
     command: [ "-e", "-strict.perms=false" ]
-    networks:
-      - logging
     depends_on:
       - logstash
-
-networks:
-  default:
-    driver: bridge
-  database:
-  logging:
-  observability:

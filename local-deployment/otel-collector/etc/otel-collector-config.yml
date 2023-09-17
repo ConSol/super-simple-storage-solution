@@ -23,7 +23,7 @@ receivers:
 
 exporters:
   jaeger:
-    endpoint: jaeger:14250
+    endpoint: s4-jaeger:14250
     tls:
       insecure: true
   prometheus:
