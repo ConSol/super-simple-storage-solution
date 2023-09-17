@@ -1,6 +1,6 @@
 # JRE 17:
-# Source: https://console.cloud.google.com/gcr/images/distroless/global/java17@sha256:7e37ceadf2b98ad23fba59aa9be2cb73c7b445e5490bdf66cae742614792f30a/details@sha256:d8e3ff1283abe92f7aa12ed4d8156d0ef04bf44e7d7c54a48c821444587fbc97
-FROM gcr.io/distroless/java17@sha256:7e37ceadf2b98ad23fba59aa9be2cb73c7b445e5490bdf66cae742614792f30a
+# Source: https://console.cloud.google.com/gcr/images/distroless/global/java17@sha256:2dcc710ed431b110113abb1c5dbb59ed14d7f54bfa49d2d97c0516cbc7e163e9
+FROM gcr.io/distroless/java17@sha256:2dcc710ed431b110113abb1c5dbb59ed14d7f54bfa49d2d97c0516cbc7e163e9
 
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:en"
 
