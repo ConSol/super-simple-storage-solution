@@ -10,5 +10,6 @@ COPY \
   --chmod=555 \
   target/*.jar /deployment/app.jar
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
-
+ENV JAVA_APP_DIR="/deployment"
+ENV JAVA_APP_JAR="${JAVA_APP_DIR}/app.jar"
+ENTRYPOINT [ "/opt/jboss/container/java/run/run-java.sh" ]

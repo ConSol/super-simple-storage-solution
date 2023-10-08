@@ -21,6 +21,7 @@ COPY \
   --chown=185 \
   --chmod=555 \
   target/quarkus-app/quarkus/ /deployment/quarkus/
+
 ENV JAVA_APP_DIR="/deployment"
 ENV JAVA_APP_JAR="${JAVA_APP_DIR}/quarkus-run.jar"
 ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"

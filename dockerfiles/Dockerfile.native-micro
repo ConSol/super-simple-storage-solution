@@ -9,4 +9,4 @@ COPY \
   --chmod=111 \
   target/*-runner /deployment/quarkus-run
 
-ENTRYPOINT ["./quarkus-run"]
+ENTRYPOINT ["./quarkus-run", "-Dquarkus.http.host=0.0.0.0"]

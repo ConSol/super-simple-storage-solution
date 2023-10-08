@@ -24,4 +24,31 @@ COPY \
   --chmod=555 \
   target/quarkus-app/quarkus/ /deployment/quarkus/
 
-ENTRYPOINT [ "java", "-jar", "quarkus-run.jar" ]
+ENV JAVA_MAX_MEM_RATIO=80.0
+ENV JAVA_MIN_MEM_RATIO=80.0
+ENV JAVA_INITIAL_MEM_RATIO=5.0
+ENV ADDITIONAL_JAVA_TOOL_OPTIONS=""
+ENV GC_MIN_HEAP_FREE_RATIO=10
+ENV GC_MAX_HEAP_FREE_RATIO=20
+ENV GC_CONTAINER_OPTIONS=-XX:+UseParallelGC
+ENV GC_MAX_METASPACE_SIZE=100
+ENV JAVA_TOOL_OPTIONS_APPEND=""
+ENV JAVA_TOOL_OPTIONS=" \
+  -XX:AdaptiveSizePolicyWeight=90 \
+  -XX:GCTimeRatio=4 \
+  -XX:MaxRAMPercentage=${JAVA_MAX_MEM_RATIO} \
+  -XX:MinRAMPercentage=${JAVA_MIN_MEM_RATIO} \
+  -XX:InitialRAMPercentage=${JAVA_INITIAL_MEM_RATIO} \
+  -XX:MaxHeapFreeRatio=${GC_MAX_HEAP_FREE_RATIO} \
+  -XX:MinHeapFreeRatio=${GC_MIN_HEAP_FREE_RATIO} \
+  ${GC_CONTAINER_OPTIONS} \
+  -XX:MaxMetaspaceSize=${GC_MAX_METASPACE_SIZE}m \
+  ${JAVA_TOOL_OPTIONS_APPEND} \
+  "
+ENTRYPOINT [ \
+  "java", \
+  "-Djava.util.logging.manager=org.jboss.logmanager.LogManager", \
+  "-Dquarkus.http.host=0.0.0.0", \
+  "-jar", \
+  "quarkus-run.jar" \
+]
